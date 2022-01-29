@@ -372,6 +372,7 @@ inline dvec4 hm_dvec4_add(dvec4* restrict v1, dvec4* restrict v2)
 {
 	__m256d a = _mm256_load_pd((const double*)v1);
 	__m256d b = _mm256_load_pd((const double*)v2);
+
 	return *(dvec4*)_mm256_add_pd(a, b).m256d_f64;
 }
 
@@ -379,6 +380,7 @@ inline dvec4 hm_dvec4_sub(dvec4* restrict v1, dvec4* restrict v2)
 {
 	__m256d a = _mm256_load_pd((const double*)v1);
 	__m256d b = _mm256_load_pd((const double*)v2);
+
 	return *(dvec4*)_mm256_sub_pd(a, b).m256d_f64;
 }
 
@@ -453,8 +455,177 @@ inline double hm_dvec4_length(dvec4* restrict v)
 }
 
 /* dvec3 functions */
+inline int hm_dvec3_equal(dvec3 v1, dvec3 v2)
+{
+	return (*(unsigned long long*)&v1.x == *(unsigned long long*)&v2.x) && 
+		   (*(unsigned long long*)&v1.y == *(unsigned long long*)&v2.y) &&
+		   (*(unsigned long long*)&v1.z == *(unsigned long long*)&v2.z);
+}
+
+inline dvec3 hm_dvec3_add(dvec3* restrict v1, dvec3* restrict v2)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v1, mask);
+	__m256d b = _mm256_maskload_pd((double const*)v2, mask);
+
+	return *(dvec3*)_mm256_add_pd(a, b).m256d_f64;
+}
+
+inline dvec3 hm_dvec3_sub(dvec3* restrict v1, dvec3* restrict v2)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v1, mask);
+	__m256d b = _mm256_maskload_pd((double const*)v2, mask);
+
+	return *(dvec3*)_mm256_sub_pd(a, b).m256d_f64;
+}
+
+inline double hm_dvec3_dot(dvec3* restrict v1, dvec3* restrict v2)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v1, mask);
+	__m256d b = _mm256_maskload_pd((double const*)v2, mask);
+
+	__m256d m = _mm256_mul_pd(a, b);
+	__m256d h1 = _mm256_hadd_pd(m, m);
+
+	return h1.m256d_f64[0] + h1.m256d_f64[2];
+}
+
+inline dvec3 hm_dvec3_cross(dvec3* restrict v1, dvec3* restrict v2)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v1, mask);
+	__m256d b = _mm256_maskload_pd((double const*)v2, mask);
+
+	__m256d aa = _mm256_permute4x64_pd(a, _MM_PERM_DACB);
+	__m256d bb = _mm256_permute4x64_pd(b, _MM_PERM_DBAC);
+	__m256d cc = _mm256_permute4x64_pd(a, _MM_PERM_DBAC);
+	__m256d dd = _mm256_permute4x64_pd(b, _MM_PERM_DACB);
+
+	__m256d e = _mm256_mul_pd(aa, bb);
+	__m256d f = _mm256_mul_pd(cc, dd);
+
+	return *(dvec3*)_mm256_sub_pd(e, f).m256d_f64;
+}
+
+inline dvec3 hm_dvec3_scalar_mul(dvec3* restrict v, double s)
+{
+	__m256d scalar = _mm256_set_pd(s, s, s, s);
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v, mask);
+
+	return *(dvec3*)_mm256_mul_pd(a, scalar).m256d_f64;
+}
+
+inline dvec3 hm_dvec3_abs(dvec3* restrict v)
+{
+	__m256d minus_two = _mm256_set1_pd(-2.0);
+	__m256d zero = _mm256_set1_pd(0);
+	__m256i loadmask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v, loadmask);
+
+	__m256d comp = _mm256_cmp_pd(a, zero, _CMP_LT_OS);
+	__m256d mask = _mm256_add_pd(_mm256_and_pd(minus_two, comp), _mm256_set_pd(1.0, 1.0, 1.0, 1.0));
+
+	return *(dvec3*)_mm256_mul_pd(a, mask).m256d_f64;
+}
+
+inline dvec3 hm_dvec3_normalize(dvec3* restrict v)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v, mask);
+
+	__m256d aa = _mm256_mul_pd(a, a);
+	__m256d hadd = _mm256_hadd_pd(aa, aa);
+	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
+	__m256d len = _mm256_sqrt_pd(dot);
+
+	return *(dvec3*)_mm256_div_pd(a, len).m256d_f64;
+}
+
+inline double hm_dvec3_length(dvec3* restrict v)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d a = _mm256_maskload_pd((double const*)v, mask);
+
+	__m256d aa = _mm256_mul_pd(a, a);
+	__m256d hadd = _mm256_hadd_pd(aa, aa);
+	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
+	
+	return _mm256_sqrt_pd(dot).m256d_f64[0];
+}
 
 /* dvec2 functions */
+inline int hm_dvec2_equal(dvec2 v1, dvec2 v2)
+{
+	return (*(unsigned long long*)&v1.x == *(unsigned long long*)&v2.x) && 
+		   (*(unsigned long long*)&v1.y == *(unsigned long long*)&v2.y);
+}
+
+inline dvec2 hm_dvec2_add(dvec2* restrict v1, dvec2* restrict v2)
+{
+	__m128d a = _mm_load_pd((double const*)v1);
+	__m128d b = _mm_load_pd((double const*)v2);
+
+	return *(dvec2*)_mm_add_pd(a, b).m128d_f64;
+}
+
+inline dvec2 hm_dvec2_sub(dvec2* restrict v1, dvec2* restrict v2)
+{
+	__m128d a = _mm_load_pd((double const*)v1);
+	__m128d b = _mm_load_pd((double const*)v2);
+
+	return *(dvec2*)_mm_sub_pd(a, b).m128d_f64;
+}
+
+inline double hm_dvec2_dot(dvec2* restrict v1, dvec2* restrict v2)
+{
+	__m128d a = _mm_load_pd((double const*)v1);
+	__m128d b = _mm_load_pd((double const*)v2);
+
+	__m128d dot = _mm_dp_pd(a, b, 0xff);
+
+	return dot.m128d_f64[0];
+}
+
+inline dvec2 hm_dvec2_scalar_mul(dvec2* restrict v, double s)
+{
+	__m128d scalar = _mm_set_pd(s, s);
+	__m128d a = _mm_load_pd((double const*)v);
+
+	return *(dvec2*)_mm_mul_pd(a, scalar).m128d_f64;
+}
+
+inline dvec2 hm_dvec2_abs(dvec2* restrict v)
+{
+	__m128d minus_two = _mm_set1_pd(-2.0);
+	__m128d zero = _mm_set1_pd(0);
+	__m128d a = _mm_load_pd((double const*)v);
+
+	__m128d comp = _mm_cmplt_pd(a, zero);
+	__m128d mask = _mm_add_pd(_mm_and_pd(minus_two, comp), _mm_set_pd(1.0, 1.0));
+
+	return *(dvec2*)_mm_mul_pd(a, mask).m128d_f64;
+}
+
+inline dvec2 hm_dvec2_normalize(dvec2* restrict v)
+{
+	__m128d a = _mm_load_pd((double const*)v);
+
+	__m128d dot = _mm_dp_pd(a, a, 0xff);
+	__m128d len = _mm_sqrt_pd(dot);
+
+	return *(dvec2*)_mm_div_pd(a, len).m128d_f64;
+}
+
+inline double hm_dvec2_length(dvec2* restrict v)
+{
+	__m128d a = _mm_load_pd((double const*)v);
+	__m128d dot = _mm_dp_pd(a, a, 0xff);
+	
+	return _mm_sqrt_pd(dot).m128d_f64[0];
+}
 
 /* mat4 functions */
 inline vec4 hm_mat4_multiply_vec4(mat4* restrict m, vec4* restrict v)
