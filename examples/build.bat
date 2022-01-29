@@ -1,3 +1,3 @@
 @echo off
 
-call cl /nologo /Zi main.c
+call cl /I.. /nologo /Zi main.c
