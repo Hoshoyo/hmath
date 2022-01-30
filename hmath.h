@@ -666,35 +666,6 @@ inline vec3 hm_mat4_multiply_vec3(mat4* restrict m, vec3* restrict v)
 	return *(vec3*)result.m128_f32;
 }
 
-inline mat4 hm_mat4_multiply(mat4* restrict m1, mat4* restrict m2)
-{
-	__m128 row1 = _mm_load_ps((const float*)&m1->data[0][0]);
-	__m128 row2 = _mm_load_ps((const float*)&m1->data[1][0]);
-	__m128 row3 = _mm_load_ps((const float*)&m1->data[2][0]);
-	__m128 row4 = _mm_load_ps((const float*)&m1->data[3][0]);
-
-	mat4 result;
-
-	for (int i = 0; i < 4; i++)
-	{
-		__m128 brod1 = _mm_set1_ps(m2->data[i][0]);
-		__m128 brod2 = _mm_set1_ps(m2->data[i][1]);
-		__m128 brod3 = _mm_set1_ps(m2->data[i][2]);
-		__m128 brod4 = _mm_set1_ps(m2->data[i][3]);
-
-		__m128 row = _mm_add_ps(
-			_mm_add_ps(
-				_mm_mul_ps(brod1, row1),
-				_mm_mul_ps(brod2, row2)),
-			_mm_add_ps(
-				_mm_mul_ps(brod3, row3),
-				_mm_mul_ps(brod4, row4)));
-		_mm_store_ps((float*)&result.data[i][0], row);
-	}
-
-	return result;
-}
-
 inline mat4 hm_mat4_scalar_product(mat4* restrict m, float scalar)
 {
 	__m128 t1 = _mm_load_ps((const float*)&m->data[0][0]);
@@ -734,6 +705,34 @@ inline mat4 hm_mat4_transpose(mat4* restrict m)
 	return result;
 }
 
+inline mat4 hm_mat4_multiply(mat4* restrict m1, mat4* restrict m2)
+{
+	mat4 transp = hm_mat4_transpose(m2);
+
+	mat4 result;
+	result.data[0][0] = hm_vec4_dot((vec4*)&m1->data[0][0], (vec4*)&transp.data[0][0]);
+	result.data[0][1] = hm_vec4_dot((vec4*)&m1->data[0][0], (vec4*)&transp.data[1][0]);
+	result.data[0][2] = hm_vec4_dot((vec4*)&m1->data[0][0], (vec4*)&transp.data[2][0]);
+	result.data[0][3] = hm_vec4_dot((vec4*)&m1->data[0][0], (vec4*)&transp.data[3][0]);
+
+	result.data[1][0] = hm_vec4_dot((vec4*)&m1->data[1][0], (vec4*)&transp.data[0][0]);
+	result.data[1][1] = hm_vec4_dot((vec4*)&m1->data[1][0], (vec4*)&transp.data[1][0]);
+	result.data[1][2] = hm_vec4_dot((vec4*)&m1->data[1][0], (vec4*)&transp.data[2][0]);
+	result.data[1][3] = hm_vec4_dot((vec4*)&m1->data[1][0], (vec4*)&transp.data[3][0]);
+
+	result.data[2][0] = hm_vec4_dot((vec4*)&m1->data[2][0], (vec4*)&transp.data[0][0]);
+	result.data[2][1] = hm_vec4_dot((vec4*)&m1->data[2][0], (vec4*)&transp.data[1][0]);
+	result.data[2][2] = hm_vec4_dot((vec4*)&m1->data[2][0], (vec4*)&transp.data[2][0]);
+	result.data[2][3] = hm_vec4_dot((vec4*)&m1->data[2][0], (vec4*)&transp.data[3][0]);
+
+	result.data[3][0] = hm_vec4_dot((vec4*)&m1->data[3][0], (vec4*)&transp.data[0][0]);
+	result.data[3][1] = hm_vec4_dot((vec4*)&m1->data[3][0], (vec4*)&transp.data[1][0]);
+	result.data[3][2] = hm_vec4_dot((vec4*)&m1->data[3][0], (vec4*)&transp.data[2][0]);
+	result.data[3][3] = hm_vec4_dot((vec4*)&m1->data[3][0], (vec4*)&transp.data[3][0]);
+
+	return result;
+}
+
 inline mat4 hm_mat4_identity()
 {
 	mat4 result;
@@ -747,6 +746,90 @@ inline mat4 hm_mat4_identity()
 }
 
 /* mat3 functions */
+inline mat3 hm_mat3_transpose(mat3* restrict m)
+{
+	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
+	__m128 t1 = _mm_maskload_ps((const float*)&m->data[0][0], mask);
+	__m128 t2 = _mm_maskload_ps((const float*)&m->data[1][0], mask);
+	__m128 t3 = _mm_maskload_ps((const float*)&m->data[2][0], mask);
+	__m128 t4 = _mm_set_ps1(0);
+	_MM_TRANSPOSE4_PS(t1, t2, t3, t4);
+
+	mat3 result;
+	_mm_maskstore_ps((float*)&result.data[0][0], mask, t1);
+	_mm_maskstore_ps((float*)&result.data[1][0], mask, t2);
+	_mm_maskstore_ps((float*)&result.data[2][0], mask, t3);
+
+	return result;
+}
+
+inline vec3 hm_mat3_multiply_vec3(mat3* restrict m, vec3* restrict v)
+{
+	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
+	__m128 vec = _mm_maskload_ps((const float*)v, mask);
+	vec.m128_f32[3] = 1.0f;
+	__m128 r1 = _mm_maskload_ps((const float*)&m->data[0][0], mask);
+	__m128 r2 = _mm_maskload_ps((const float*)&m->data[1][0], mask);
+	__m128 r3 = _mm_maskload_ps((const float*)&m->data[2][0], mask);
+
+	__m128 prod1 = _mm_dp_ps(r1, vec, 0xFF);
+	__m128 prod2 = _mm_dp_ps(r2, vec, 0xFF);
+	__m128 prod3 = _mm_dp_ps(r3, vec, 0xFF);
+
+	return (vec3){prod1.m128_f32[0], prod2.m128_f32[0], prod3.m128_f32[0] };
+}
+
+inline mat3 hm_mat3_scalar_product(mat3* restrict m, float scalar)
+{
+	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
+	__m128 t1 = _mm_maskload_ps((const float*)&m->data[0][0], mask);
+	__m128 t2 = _mm_maskload_ps((const float*)&m->data[1][0], mask);
+	__m128 t3 = _mm_maskload_ps((const float*)&m->data[2][0], mask);
+	__m128 s = _mm_set1_ps(scalar);
+
+	t1 = _mm_mul_ps(t1, s);
+	t2 = _mm_mul_ps(t2, s);
+	t3 = _mm_mul_ps(t3, s);
+
+	mat3 result;
+	_mm_maskstore_ps((float*)&result.data[0][0], mask, t1);
+	_mm_maskstore_ps((float*)&result.data[1][0], mask, t2);
+	_mm_maskstore_ps((float*)&result.data[2][0], mask, t3);
+
+	return result;
+}
+
+inline mat3 hm_mat3_multiply(mat3* restrict m1, mat3* restrict m2)
+{
+	mat3 transp = hm_mat3_transpose(m2);
+
+	mat3 result;
+	result.data[0][0] = hm_vec3_dot((vec3*)&m1->data[0][0], (vec3*)&transp.data[0][0]);
+	result.data[0][1] = hm_vec3_dot((vec3*)&m1->data[0][0], (vec3*)&transp.data[1][0]);
+	result.data[0][2] = hm_vec3_dot((vec3*)&m1->data[0][0], (vec3*)&transp.data[2][0]);
+
+	result.data[1][0] = hm_vec3_dot((vec3*)&m1->data[1][0], (vec3*)&transp.data[0][0]);
+	result.data[1][1] = hm_vec3_dot((vec3*)&m1->data[1][0], (vec3*)&transp.data[1][0]);
+	result.data[1][2] = hm_vec3_dot((vec3*)&m1->data[1][0], (vec3*)&transp.data[2][0]);
+
+	result.data[2][0] = hm_vec3_dot((vec3*)&m1->data[2][0], (vec3*)&transp.data[0][0]);
+	result.data[2][1] = hm_vec3_dot((vec3*)&m1->data[2][0], (vec3*)&transp.data[1][0]);
+	result.data[2][2] = hm_vec3_dot((vec3*)&m1->data[2][0], (vec3*)&transp.data[2][0]);
+
+	return result;
+}
+
+inline mat3 hm_mat3_identity()
+{
+	mat3 result;
+
+	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
+	_mm_maskstore_ps((float*)&result.data[2][0], mask, _mm_set_ps(0, 1, 0, 0));
+	_mm_maskstore_ps((float*)&result.data[1][0], mask, _mm_set_ps(0, 0, 1, 0));
+	_mm_maskstore_ps((float*)&result.data[0][0], mask, _mm_set_ps(0, 0, 0, 1));
+
+	return result;
+}
 
 /* mat2 functions */
 
@@ -805,35 +888,6 @@ inline dvec3 hm_dmat4_multiply_dvec3(dmat4* restrict m, dvec3* restrict v)
 	return (dvec3) { prod1.m256d_f64[0], prod2.m256d_f64[0], prod3.m256d_f64[0] };
 }
 
-inline dmat4 hm_dmat4_multiply(dmat4* restrict m1, dmat4* restrict m2)
-{
-	__m256d row1 = _mm256_load_pd((const double*)&m1->data[0][0]);
-	__m256d row2 = _mm256_load_pd((const double*)&m1->data[1][0]);
-	__m256d row3 = _mm256_load_pd((const double*)&m1->data[2][0]);
-	__m256d row4 = _mm256_load_pd((const double*)&m1->data[3][0]);
-
-	dmat4 result;
-
-	for (int i = 0; i < 4; i++)
-	{
-		__m256d brod1 = _mm256_set1_pd(m2->data[i][0]);
-		__m256d brod2 = _mm256_set1_pd(m2->data[i][1]);
-		__m256d brod3 = _mm256_set1_pd(m2->data[i][2]);
-		__m256d brod4 = _mm256_set1_pd(m2->data[i][3]);
-
-		__m256d row = _mm256_add_pd(
-			_mm256_add_pd(
-				_mm256_mul_pd(brod1, row1),
-				_mm256_mul_pd(brod2, row2)),
-			_mm256_add_pd(
-				_mm256_mul_pd(brod3, row3),
-				_mm256_mul_pd(brod4, row4)));
-		_mm256_store_pd((double*)&result.data[i][0], row);
-	}
-
-	return result;
-}
-
 inline dmat4 hm_dmat4_scalar_product(dmat4* restrict m, double scalar)
 {
 	__m256d t1 = _mm256_load_pd((const double*)&m->data[0][0]);
@@ -882,6 +936,34 @@ inline dmat4 hm_dmat4_transpose(dmat4* restrict m)
 	_mm256_store_pd((double*)&result.data[1][0], g3);
 	_mm256_store_pd((double*)&result.data[2][0], i3);
 	_mm256_store_pd((double*)&result.data[3][0], j3);
+
+	return result;
+}
+
+inline dmat4 hm_dmat4_multiply(dmat4* restrict m1, dmat4* restrict m2)
+{
+	dmat4 transp = hm_dmat4_transpose(m2);
+
+	dmat4 result;
+	result.data[0][0] = hm_dvec4_dot((dvec4*)&m1->data[0][0], (dvec4*)&transp.data[0][0]);
+	result.data[0][1] = hm_dvec4_dot((dvec4*)&m1->data[0][0], (dvec4*)&transp.data[1][0]);
+	result.data[0][2] = hm_dvec4_dot((dvec4*)&m1->data[0][0], (dvec4*)&transp.data[2][0]);
+	result.data[0][3] = hm_dvec4_dot((dvec4*)&m1->data[0][0], (dvec4*)&transp.data[3][0]);
+
+	result.data[1][0] = hm_dvec4_dot((dvec4*)&m1->data[1][0], (dvec4*)&transp.data[0][0]);
+	result.data[1][1] = hm_dvec4_dot((dvec4*)&m1->data[1][0], (dvec4*)&transp.data[1][0]);
+	result.data[1][2] = hm_dvec4_dot((dvec4*)&m1->data[1][0], (dvec4*)&transp.data[2][0]);
+	result.data[1][3] = hm_dvec4_dot((dvec4*)&m1->data[1][0], (dvec4*)&transp.data[3][0]);
+
+	result.data[2][0] = hm_dvec4_dot((dvec4*)&m1->data[2][0], (dvec4*)&transp.data[0][0]);
+	result.data[2][1] = hm_dvec4_dot((dvec4*)&m1->data[2][0], (dvec4*)&transp.data[1][0]);
+	result.data[2][2] = hm_dvec4_dot((dvec4*)&m1->data[2][0], (dvec4*)&transp.data[2][0]);
+	result.data[2][3] = hm_dvec4_dot((dvec4*)&m1->data[2][0], (dvec4*)&transp.data[3][0]);
+
+	result.data[3][0] = hm_dvec4_dot((dvec4*)&m1->data[3][0], (dvec4*)&transp.data[0][0]);
+	result.data[3][1] = hm_dvec4_dot((dvec4*)&m1->data[3][0], (dvec4*)&transp.data[1][0]);
+	result.data[3][2] = hm_dvec4_dot((dvec4*)&m1->data[3][0], (dvec4*)&transp.data[2][0]);
+	result.data[3][3] = hm_dvec4_dot((dvec4*)&m1->data[3][0], (dvec4*)&transp.data[3][0]);
 
 	return result;
 }

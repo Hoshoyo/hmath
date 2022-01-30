@@ -255,22 +255,22 @@ void test_mat4()
 	        (rmulv3.z == m1.data[2][0] * v.x + m1.data[2][1] * v.y + m1.data[2][2] * v.z + m1.data[2][3] * 1.0f));
 
     mat4 rmul = hm_mat4_multiply(&m1, &m2);
-    assert( (rmul.data[0][0] = m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0] + m1.data[0][2] * m2.data[2][0] + m1.data[0][3] * m2.data[3][0]) &&
-            (rmul.data[0][1] = m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1] + m1.data[0][2] * m2.data[2][1] + m1.data[0][3] * m2.data[3][1]) &&
-            (rmul.data[0][2] = m1.data[0][0] * m2.data[0][2] + m1.data[0][1] * m2.data[1][2] + m1.data[0][2] * m2.data[2][2] + m1.data[0][3] * m2.data[3][2]) &&
-            (rmul.data[0][3] = m1.data[0][0] * m2.data[0][3] + m1.data[0][1] * m2.data[1][3] + m1.data[0][2] * m2.data[2][3] + m1.data[0][3] * m2.data[3][3]) &&
-            (rmul.data[1][0] = m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0] + m1.data[1][2] * m2.data[2][0] + m1.data[1][3] * m2.data[3][0]) &&
-            (rmul.data[1][1] = m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1] + m1.data[1][2] * m2.data[2][1] + m1.data[1][3] * m2.data[3][1]) &&
-            (rmul.data[1][2] = m1.data[1][0] * m2.data[0][2] + m1.data[1][1] * m2.data[1][2] + m1.data[1][2] * m2.data[2][2] + m1.data[1][3] * m2.data[3][2]) &&
-            (rmul.data[1][3] = m1.data[1][0] * m2.data[0][3] + m1.data[1][1] * m2.data[1][3] + m1.data[1][2] * m2.data[2][3] + m1.data[1][3] * m2.data[3][3]) &&
-            (rmul.data[2][0] = m1.data[2][0] * m2.data[0][0] + m1.data[2][1] * m2.data[1][0] + m1.data[2][2] * m2.data[2][0] + m1.data[2][3] * m2.data[3][0]) &&
-            (rmul.data[2][1] = m1.data[2][0] * m2.data[0][1] + m1.data[2][1] * m2.data[1][1] + m1.data[2][2] * m2.data[2][1] + m1.data[2][3] * m2.data[3][1]) &&
-            (rmul.data[2][2] = m1.data[2][0] * m2.data[0][2] + m1.data[2][1] * m2.data[1][2] + m1.data[2][2] * m2.data[2][2] + m1.data[2][3] * m2.data[3][2]) &&
-            (rmul.data[2][3] = m1.data[2][0] * m2.data[0][3] + m1.data[2][1] * m2.data[1][3] + m1.data[2][2] * m2.data[2][3] + m1.data[2][3] * m2.data[3][3]) &&
-            (rmul.data[3][0] = m1.data[3][0] * m2.data[0][0] + m1.data[3][1] * m2.data[1][0] + m1.data[3][2] * m2.data[2][0] + m1.data[3][3] * m2.data[3][0]) &&
-            (rmul.data[3][1] = m1.data[3][0] * m2.data[0][1] + m1.data[3][1] * m2.data[1][1] + m1.data[3][2] * m2.data[2][1] + m1.data[3][3] * m2.data[3][1]) &&
-            (rmul.data[3][2] = m1.data[3][0] * m2.data[0][2] + m1.data[3][1] * m2.data[1][2] + m1.data[3][2] * m2.data[2][2] + m1.data[3][3] * m2.data[3][2]) &&
-            (rmul.data[3][3] = m1.data[3][0] * m2.data[0][3] + m1.data[3][1] * m2.data[1][3] + m1.data[3][2] * m2.data[2][3] + m1.data[3][3] * m2.data[3][3]));
+    assert( (rmul.data[0][0] == (m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0] + m1.data[0][2] * m2.data[2][0] + m1.data[0][3] * m2.data[3][0])) &&
+            (rmul.data[0][1] == (m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1] + m1.data[0][2] * m2.data[2][1] + m1.data[0][3] * m2.data[3][1])) &&
+            (rmul.data[0][2] == (m1.data[0][0] * m2.data[0][2] + m1.data[0][1] * m2.data[1][2] + m1.data[0][2] * m2.data[2][2] + m1.data[0][3] * m2.data[3][2])) &&
+            (rmul.data[0][3] == (m1.data[0][0] * m2.data[0][3] + m1.data[0][1] * m2.data[1][3] + m1.data[0][2] * m2.data[2][3] + m1.data[0][3] * m2.data[3][3])) &&
+            (rmul.data[1][0] == (m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0] + m1.data[1][2] * m2.data[2][0] + m1.data[1][3] * m2.data[3][0])) &&
+            (rmul.data[1][1] == (m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1] + m1.data[1][2] * m2.data[2][1] + m1.data[1][3] * m2.data[3][1])) &&
+            (rmul.data[1][2] == (m1.data[1][0] * m2.data[0][2] + m1.data[1][1] * m2.data[1][2] + m1.data[1][2] * m2.data[2][2] + m1.data[1][3] * m2.data[3][2])) &&
+            (rmul.data[1][3] == (m1.data[1][0] * m2.data[0][3] + m1.data[1][1] * m2.data[1][3] + m1.data[1][2] * m2.data[2][3] + m1.data[1][3] * m2.data[3][3])) &&
+            (rmul.data[2][0] == (m1.data[2][0] * m2.data[0][0] + m1.data[2][1] * m2.data[1][0] + m1.data[2][2] * m2.data[2][0] + m1.data[2][3] * m2.data[3][0])) &&
+            (rmul.data[2][1] == (m1.data[2][0] * m2.data[0][1] + m1.data[2][1] * m2.data[1][1] + m1.data[2][2] * m2.data[2][1] + m1.data[2][3] * m2.data[3][1])) &&
+            (rmul.data[2][2] == (m1.data[2][0] * m2.data[0][2] + m1.data[2][1] * m2.data[1][2] + m1.data[2][2] * m2.data[2][2] + m1.data[2][3] * m2.data[3][2])) &&
+            (rmul.data[2][3] == (m1.data[2][0] * m2.data[0][3] + m1.data[2][1] * m2.data[1][3] + m1.data[2][2] * m2.data[2][3] + m1.data[2][3] * m2.data[3][3])) &&
+            (rmul.data[3][0] == (m1.data[3][0] * m2.data[0][0] + m1.data[3][1] * m2.data[1][0] + m1.data[3][2] * m2.data[2][0] + m1.data[3][3] * m2.data[3][0])) &&
+            (rmul.data[3][1] == (m1.data[3][0] * m2.data[0][1] + m1.data[3][1] * m2.data[1][1] + m1.data[3][2] * m2.data[2][1] + m1.data[3][3] * m2.data[3][1])) &&
+            (rmul.data[3][2] == (m1.data[3][0] * m2.data[0][2] + m1.data[3][1] * m2.data[1][2] + m1.data[3][2] * m2.data[2][2] + m1.data[3][3] * m2.data[3][2])) &&
+            (rmul.data[3][3] == (m1.data[3][0] * m2.data[0][3] + m1.data[3][1] * m2.data[1][3] + m1.data[3][2] * m2.data[2][3] + m1.data[3][3] * m2.data[3][3])));
     
     mat4 rsprod = hm_mat4_scalar_product(&m1, scalar);
     assert( (rsprod.data[0][0] == scalar * m1.data[0][0]) && (rsprod.data[0][1] == scalar * m1.data[0][1]) && (rsprod.data[0][2] == scalar * m1.data[0][2]) && (rsprod.data[0][3] == scalar * m1.data[0][3]) &&
@@ -289,6 +289,54 @@ void test_mat4()
             (rident.data[0][1] == 0.0) && (rident.data[1][1] == 1.0) && (rident.data[2][1] == 0.0) && (rident.data[3][1] == 0.0) &&
             (rident.data[0][2] == 0.0) && (rident.data[1][2] == 0.0) && (rident.data[2][2] == 1.0) && (rident.data[3][2] == 0.0) &&
             (rident.data[0][3] == 0.0) && (rident.data[1][3] == 0.0) && (rident.data[2][3] == 0.0) && (rident.data[3][3] == 1.0));
+}
+
+void test_mat3()
+{
+    mat3 m1 = {
+        0,1,2,
+        4,5,6,
+        8,9,10
+    };
+    mat3 m2 = {
+        5,5,5,
+        3,-3,-3,
+        1,2,3,
+    };
+    vec3 v3 = (vec3){1,2,3};
+    float scalar = 5.0f;
+
+    vec3 rmulv3 = hm_mat3_multiply_vec3(&m1, &v3);
+    assert( (rmulv3.x == m1.data[0][0] * v3.x + m1.data[0][1] * v3.y + m1.data[0][2] * v3.z) &&
+	        (rmulv3.y == m1.data[1][0] * v3.x + m1.data[1][1] * v3.y + m1.data[1][2] * v3.z) &&
+	        (rmulv3.z == m1.data[2][0] * v3.x + m1.data[2][1] * v3.y + m1.data[2][2] * v3.z));
+
+    mat3 rmul = hm_mat3_multiply(&m1, &m2);
+    assert(
+        rmul.data[0][0] == (m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0] + m1.data[0][2] * m2.data[2][0]) &&
+        rmul.data[0][1] == (m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1] + m1.data[0][2] * m2.data[2][1]) &&
+        rmul.data[0][2] == (m1.data[0][0] * m2.data[0][2] + m1.data[0][1] * m2.data[1][2] + m1.data[0][2] * m2.data[2][2]) &&
+        rmul.data[1][0] == (m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0] + m1.data[1][2] * m2.data[2][0]) &&
+        rmul.data[1][1] == (m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1] + m1.data[1][2] * m2.data[2][1]) &&
+        rmul.data[1][2] == (m1.data[1][0] * m2.data[0][2] + m1.data[1][1] * m2.data[1][2] + m1.data[1][2] * m2.data[2][2]) &&
+        rmul.data[2][0] == (m1.data[2][0] * m2.data[0][0] + m1.data[2][1] * m2.data[1][0] + m1.data[2][2] * m2.data[2][0]) &&
+        rmul.data[2][1] == (m1.data[2][0] * m2.data[0][1] + m1.data[2][1] * m2.data[1][1] + m1.data[2][2] * m2.data[2][1]) &&
+        rmul.data[2][2] == (m1.data[2][0] * m2.data[0][2] + m1.data[2][1] * m2.data[1][2] + m1.data[2][2] * m2.data[2][2]));
+    
+    mat3 rsprod = hm_mat3_scalar_product(&m1, scalar);
+    assert( (rsprod.data[0][0] == scalar * m1.data[0][0]) && (rsprod.data[0][1] == scalar * m1.data[0][1]) && (rsprod.data[0][2] == scalar * m1.data[0][2]) &&
+            (rsprod.data[1][0] == scalar * m1.data[1][0]) && (rsprod.data[1][1] == scalar * m1.data[1][1]) && (rsprod.data[1][2] == scalar * m1.data[1][2]) &&
+            (rsprod.data[2][0] == scalar * m1.data[2][0]) && (rsprod.data[2][1] == scalar * m1.data[2][1]) && (rsprod.data[2][2] == scalar * m1.data[2][2]));
+
+    mat3 rtransp = hm_mat3_transpose(&m1);
+    assert( (rtransp.data[0][0] == m1.data[0][0]) && (rtransp.data[1][0] == m1.data[0][1]) && (rtransp.data[2][0] == m1.data[0][2]) &&
+            (rtransp.data[0][1] == m1.data[1][0]) && (rtransp.data[1][1] == m1.data[1][1]) && (rtransp.data[2][1] == m1.data[1][2]) &&
+            (rtransp.data[0][2] == m1.data[2][0]) && (rtransp.data[1][2] == m1.data[2][1]) && (rtransp.data[2][2] == m1.data[2][2]));
+
+    mat3 rident = hm_mat3_identity();
+    assert( (rident.data[0][0] == 1.0) && (rident.data[1][0] == 0.0) && (rident.data[2][0] == 0.0) &&
+            (rident.data[0][1] == 0.0) && (rident.data[1][1] == 1.0) && (rident.data[2][1] == 0.0) &&
+            (rident.data[0][2] == 0.0) && (rident.data[1][2] == 0.0) && (rident.data[2][2] == 1.0));
 }
 
 void test_dmat4()
@@ -321,22 +369,22 @@ void test_dmat4()
 	        (rmulv3.z == m1.data[2][0] * v.x + m1.data[2][1] * v.y + m1.data[2][2] * v.z + m1.data[2][3] * 1.0f));
 
     dmat4 rmul = hm_dmat4_multiply(&m1, &m2);
-    assert( (rmul.data[0][0] = m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0] + m1.data[0][2] * m2.data[2][0] + m1.data[0][3] * m2.data[3][0]) &&
-            (rmul.data[0][1] = m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1] + m1.data[0][2] * m2.data[2][1] + m1.data[0][3] * m2.data[3][1]) &&
-            (rmul.data[0][2] = m1.data[0][0] * m2.data[0][2] + m1.data[0][1] * m2.data[1][2] + m1.data[0][2] * m2.data[2][2] + m1.data[0][3] * m2.data[3][2]) &&
-            (rmul.data[0][3] = m1.data[0][0] * m2.data[0][3] + m1.data[0][1] * m2.data[1][3] + m1.data[0][2] * m2.data[2][3] + m1.data[0][3] * m2.data[3][3]) &&
-            (rmul.data[1][0] = m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0] + m1.data[1][2] * m2.data[2][0] + m1.data[1][3] * m2.data[3][0]) &&
-            (rmul.data[1][1] = m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1] + m1.data[1][2] * m2.data[2][1] + m1.data[1][3] * m2.data[3][1]) &&
-            (rmul.data[1][2] = m1.data[1][0] * m2.data[0][2] + m1.data[1][1] * m2.data[1][2] + m1.data[1][2] * m2.data[2][2] + m1.data[1][3] * m2.data[3][2]) &&
-            (rmul.data[1][3] = m1.data[1][0] * m2.data[0][3] + m1.data[1][1] * m2.data[1][3] + m1.data[1][2] * m2.data[2][3] + m1.data[1][3] * m2.data[3][3]) &&
-            (rmul.data[2][0] = m1.data[2][0] * m2.data[0][0] + m1.data[2][1] * m2.data[1][0] + m1.data[2][2] * m2.data[2][0] + m1.data[2][3] * m2.data[3][0]) &&
-            (rmul.data[2][1] = m1.data[2][0] * m2.data[0][1] + m1.data[2][1] * m2.data[1][1] + m1.data[2][2] * m2.data[2][1] + m1.data[2][3] * m2.data[3][1]) &&
-            (rmul.data[2][2] = m1.data[2][0] * m2.data[0][2] + m1.data[2][1] * m2.data[1][2] + m1.data[2][2] * m2.data[2][2] + m1.data[2][3] * m2.data[3][2]) &&
-            (rmul.data[2][3] = m1.data[2][0] * m2.data[0][3] + m1.data[2][1] * m2.data[1][3] + m1.data[2][2] * m2.data[2][3] + m1.data[2][3] * m2.data[3][3]) &&
-            (rmul.data[3][0] = m1.data[3][0] * m2.data[0][0] + m1.data[3][1] * m2.data[1][0] + m1.data[3][2] * m2.data[2][0] + m1.data[3][3] * m2.data[3][0]) &&
-            (rmul.data[3][1] = m1.data[3][0] * m2.data[0][1] + m1.data[3][1] * m2.data[1][1] + m1.data[3][2] * m2.data[2][1] + m1.data[3][3] * m2.data[3][1]) &&
-            (rmul.data[3][2] = m1.data[3][0] * m2.data[0][2] + m1.data[3][1] * m2.data[1][2] + m1.data[3][2] * m2.data[2][2] + m1.data[3][3] * m2.data[3][2]) &&
-            (rmul.data[3][3] = m1.data[3][0] * m2.data[0][3] + m1.data[3][1] * m2.data[1][3] + m1.data[3][2] * m2.data[2][3] + m1.data[3][3] * m2.data[3][3]));
+    assert( (rmul.data[0][0] == (m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0] + m1.data[0][2] * m2.data[2][0] + m1.data[0][3] * m2.data[3][0])) &&
+            (rmul.data[0][1] == (m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1] + m1.data[0][2] * m2.data[2][1] + m1.data[0][3] * m2.data[3][1])) &&
+            (rmul.data[0][2] == (m1.data[0][0] * m2.data[0][2] + m1.data[0][1] * m2.data[1][2] + m1.data[0][2] * m2.data[2][2] + m1.data[0][3] * m2.data[3][2])) &&
+            (rmul.data[0][3] == (m1.data[0][0] * m2.data[0][3] + m1.data[0][1] * m2.data[1][3] + m1.data[0][2] * m2.data[2][3] + m1.data[0][3] * m2.data[3][3])) &&
+            (rmul.data[1][0] == (m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0] + m1.data[1][2] * m2.data[2][0] + m1.data[1][3] * m2.data[3][0])) &&
+            (rmul.data[1][1] == (m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1] + m1.data[1][2] * m2.data[2][1] + m1.data[1][3] * m2.data[3][1])) &&
+            (rmul.data[1][2] == (m1.data[1][0] * m2.data[0][2] + m1.data[1][1] * m2.data[1][2] + m1.data[1][2] * m2.data[2][2] + m1.data[1][3] * m2.data[3][2])) &&
+            (rmul.data[1][3] == (m1.data[1][0] * m2.data[0][3] + m1.data[1][1] * m2.data[1][3] + m1.data[1][2] * m2.data[2][3] + m1.data[1][3] * m2.data[3][3])) &&
+            (rmul.data[2][0] == (m1.data[2][0] * m2.data[0][0] + m1.data[2][1] * m2.data[1][0] + m1.data[2][2] * m2.data[2][0] + m1.data[2][3] * m2.data[3][0])) &&
+            (rmul.data[2][1] == (m1.data[2][0] * m2.data[0][1] + m1.data[2][1] * m2.data[1][1] + m1.data[2][2] * m2.data[2][1] + m1.data[2][3] * m2.data[3][1])) &&
+            (rmul.data[2][2] == (m1.data[2][0] * m2.data[0][2] + m1.data[2][1] * m2.data[1][2] + m1.data[2][2] * m2.data[2][2] + m1.data[2][3] * m2.data[3][2])) &&
+            (rmul.data[2][3] == (m1.data[2][0] * m2.data[0][3] + m1.data[2][1] * m2.data[1][3] + m1.data[2][2] * m2.data[2][3] + m1.data[2][3] * m2.data[3][3])) &&
+            (rmul.data[3][0] == (m1.data[3][0] * m2.data[0][0] + m1.data[3][1] * m2.data[1][0] + m1.data[3][2] * m2.data[2][0] + m1.data[3][3] * m2.data[3][0])) &&
+            (rmul.data[3][1] == (m1.data[3][0] * m2.data[0][1] + m1.data[3][1] * m2.data[1][1] + m1.data[3][2] * m2.data[2][1] + m1.data[3][3] * m2.data[3][1])) &&
+            (rmul.data[3][2] == (m1.data[3][0] * m2.data[0][2] + m1.data[3][1] * m2.data[1][2] + m1.data[3][2] * m2.data[2][2] + m1.data[3][3] * m2.data[3][2])) &&
+            (rmul.data[3][3] == (m1.data[3][0] * m2.data[0][3] + m1.data[3][1] * m2.data[1][3] + m1.data[3][2] * m2.data[2][3] + m1.data[3][3] * m2.data[3][3])));
     
     dmat4 rsprod = hm_dmat4_scalar_product(&m1, scalar);
     assert( (rsprod.data[0][0] == scalar * m1.data[0][0]) && (rsprod.data[0][1] == scalar * m1.data[0][1]) && (rsprod.data[0][2] == scalar * m1.data[0][2]) && (rsprod.data[0][3] == scalar * m1.data[0][3]) &&
@@ -360,6 +408,7 @@ void test_dmat4()
 int main(int argc, char** argv)
 {
     test_mat4();
+    test_mat3();
     test_dmat4();
     test_dvec2();
     test_dvec3();
