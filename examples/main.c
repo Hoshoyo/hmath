@@ -339,6 +339,37 @@ void test_mat3()
             (rident.data[0][2] == 0.0) && (rident.data[1][2] == 0.0) && (rident.data[2][2] == 1.0));
 }
 
+void test_mat2()
+{
+    mat2 m1 = {
+        1,2,
+        3,4
+    };
+    mat2 m2 = {
+        5,6,
+        7,8
+    };
+    float scalar = 5.0f;
+
+    mat2 rmul = hm_mat2_multiply(&m1, &m2);
+    assert( rmul.data[0][0] == (m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0]) &&
+            rmul.data[0][1] == (m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1]) &&
+            rmul.data[1][0] == (m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0]) &&
+            rmul.data[1][1] == (m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1]));
+    
+    mat2 rsprod = hm_mat2_scalar_product(&m1, scalar);
+    assert( (rsprod.data[0][0] == scalar * m1.data[0][0]) && (rsprod.data[0][1] == scalar * m1.data[0][1]) &&
+            (rsprod.data[1][0] == scalar * m1.data[1][0]) && (rsprod.data[1][1] == scalar * m1.data[1][1]));
+
+    mat2 rtransp = hm_mat2_transpose(&m1);
+    assert( (rtransp.data[0][0] == m1.data[0][0]) && (rtransp.data[1][0] == m1.data[0][1]) &&
+            (rtransp.data[0][1] == m1.data[1][0]) && (rtransp.data[1][1] == m1.data[1][1]));
+
+    mat2 rident = hm_mat2_identity();
+    assert( (rident.data[0][0] == 1.0) && (rident.data[1][0] == 0.0) &&
+            (rident.data[0][1] == 0.0) && (rident.data[1][1] == 1.0));
+}
+
 void test_dmat4()
 {
     dmat4 m1 = {
@@ -405,11 +436,61 @@ void test_dmat4()
             (rident.data[0][3] == 0.0) && (rident.data[1][3] == 0.0) && (rident.data[2][3] == 0.0) && (rident.data[3][3] == 1.0));
 }
 
+void test_dmat3()
+{
+    dmat3 m1 = {
+        0,1,2,
+        4,5,6,
+        8,9,10
+    };
+    dmat3 m2 = {
+        5,5,5,
+        3,-3,-3,
+        1,2,3,
+    };
+    dvec3 v3 = (dvec3){1,2,3};
+    double scalar = 5.0f;
+
+    dvec3 rmulv3 = hm_dmat3_multiply_dvec3(&m1, &v3);
+    assert( (rmulv3.x == m1.data[0][0] * v3.x + m1.data[0][1] * v3.y + m1.data[0][2] * v3.z) &&
+	        (rmulv3.y == m1.data[1][0] * v3.x + m1.data[1][1] * v3.y + m1.data[1][2] * v3.z) &&
+	        (rmulv3.z == m1.data[2][0] * v3.x + m1.data[2][1] * v3.y + m1.data[2][2] * v3.z));
+
+    dmat3 rmul = hm_dmat3_multiply(&m1, &m2);
+    assert(
+        rmul.data[0][0] == (m1.data[0][0] * m2.data[0][0] + m1.data[0][1] * m2.data[1][0] + m1.data[0][2] * m2.data[2][0]) &&
+        rmul.data[0][1] == (m1.data[0][0] * m2.data[0][1] + m1.data[0][1] * m2.data[1][1] + m1.data[0][2] * m2.data[2][1]) &&
+        rmul.data[0][2] == (m1.data[0][0] * m2.data[0][2] + m1.data[0][1] * m2.data[1][2] + m1.data[0][2] * m2.data[2][2]) &&
+        rmul.data[1][0] == (m1.data[1][0] * m2.data[0][0] + m1.data[1][1] * m2.data[1][0] + m1.data[1][2] * m2.data[2][0]) &&
+        rmul.data[1][1] == (m1.data[1][0] * m2.data[0][1] + m1.data[1][1] * m2.data[1][1] + m1.data[1][2] * m2.data[2][1]) &&
+        rmul.data[1][2] == (m1.data[1][0] * m2.data[0][2] + m1.data[1][1] * m2.data[1][2] + m1.data[1][2] * m2.data[2][2]) &&
+        rmul.data[2][0] == (m1.data[2][0] * m2.data[0][0] + m1.data[2][1] * m2.data[1][0] + m1.data[2][2] * m2.data[2][0]) &&
+        rmul.data[2][1] == (m1.data[2][0] * m2.data[0][1] + m1.data[2][1] * m2.data[1][1] + m1.data[2][2] * m2.data[2][1]) &&
+        rmul.data[2][2] == (m1.data[2][0] * m2.data[0][2] + m1.data[2][1] * m2.data[1][2] + m1.data[2][2] * m2.data[2][2]));
+    
+    dmat3 rsprod = hm_dmat3_scalar_product(&m1, scalar);
+    assert( (rsprod.data[0][0] == scalar * m1.data[0][0]) && (rsprod.data[0][1] == scalar * m1.data[0][1]) && (rsprod.data[0][2] == scalar * m1.data[0][2]) &&
+            (rsprod.data[1][0] == scalar * m1.data[1][0]) && (rsprod.data[1][1] == scalar * m1.data[1][1]) && (rsprod.data[1][2] == scalar * m1.data[1][2]) &&
+            (rsprod.data[2][0] == scalar * m1.data[2][0]) && (rsprod.data[2][1] == scalar * m1.data[2][1]) && (rsprod.data[2][2] == scalar * m1.data[2][2]));
+
+    dmat3 rtransp = hm_dmat3_transpose(&m1);
+    assert( (rtransp.data[0][0] == m1.data[0][0]) && (rtransp.data[1][0] == m1.data[0][1]) && (rtransp.data[2][0] == m1.data[0][2]) &&
+            (rtransp.data[0][1] == m1.data[1][0]) && (rtransp.data[1][1] == m1.data[1][1]) && (rtransp.data[2][1] == m1.data[1][2]) &&
+            (rtransp.data[0][2] == m1.data[2][0]) && (rtransp.data[1][2] == m1.data[2][1]) && (rtransp.data[2][2] == m1.data[2][2]));
+
+    dmat3 rident = hm_dmat3_identity();
+    assert( (rident.data[0][0] == 1.0) && (rident.data[1][0] == 0.0) && (rident.data[2][0] == 0.0) &&
+            (rident.data[0][1] == 0.0) && (rident.data[1][1] == 1.0) && (rident.data[2][1] == 0.0) &&
+            (rident.data[0][2] == 0.0) && (rident.data[1][2] == 0.0) && (rident.data[2][2] == 1.0));
+}
+
 int main(int argc, char** argv)
 {
     test_mat4();
-    test_mat3();
     test_dmat4();
+    test_mat3();
+    test_dmat3();
+    test_mat2();
     test_dvec2();
     test_dvec3();
     test_dvec4();
