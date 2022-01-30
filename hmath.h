@@ -646,7 +646,7 @@ inline vec4 hm_mat4_multiply_vec4(mat4* restrict m, vec4* restrict v)
 	return *(vec4*)result.m128_f32;
 }
 
-inline vec3 sm_mat4_multiply_vec3(mat4* restrict m, vec3* restrict v)
+inline vec3 hm_mat4_multiply_vec3(mat4* restrict m, vec3* restrict v)
 {
 	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
 	__m128 vec = _mm_maskload_ps((const float*)v, mask);
@@ -717,11 +717,186 @@ inline mat4 hm_mat4_scalar_product(mat4* restrict m, float scalar)
 	return result;
 }
 
+inline mat4 hm_mat4_transpose(mat4* restrict m)
+{
+	__m128 t1 = _mm_load_ps((const float*)&m->data[0][0]);
+	__m128 t2 = _mm_load_ps((const float*)&m->data[1][0]);
+	__m128 t3 = _mm_load_ps((const float*)&m->data[2][0]);
+	__m128 t4 = _mm_load_ps((const float*)&m->data[3][0]);
+	_MM_TRANSPOSE4_PS(t1, t2, t3, t4);
+
+	mat4 result;
+	_mm_store_ps((float*)&result.data[0][0], t1);
+	_mm_store_ps((float*)&result.data[1][0], t2);
+	_mm_store_ps((float*)&result.data[2][0], t3);
+	_mm_store_ps((float*)&result.data[3][0], t4);
+
+	return result;
+}
+
+inline mat4 hm_mat4_identity()
+{
+	mat4 result;
+	
+	_mm_store_ps((float*)&result.data[3][0], _mm_set_ps(1, 0, 0, 0));
+	_mm_store_ps((float*)&result.data[2][0], _mm_set_ps(0, 1, 0, 0));
+	_mm_store_ps((float*)&result.data[1][0], _mm_set_ps(0, 0, 1, 0));
+	_mm_store_ps((float*)&result.data[0][0], _mm_set_ps(0, 0, 0, 1));
+
+	return result;
+}
+
 /* mat3 functions */
 
 /* mat2 functions */
 
 /* dmat4 functions */
+inline dvec4 hm_dmat4_multiply_dvec4(dmat4* restrict m, dvec4* restrict v)
+{
+	__m256d vec = _mm256_load_pd((const double*)v);
+
+	__m256d r1 = _mm256_load_pd((const double*)&m->data[0][0]);
+	__m256d r2 = _mm256_load_pd((const double*)&m->data[1][0]);
+	__m256d r3 = _mm256_load_pd((const double*)&m->data[2][0]);
+	__m256d r4 = _mm256_load_pd((const double*)&m->data[3][0]);
+
+	__m256d m1 = _mm256_mul_pd(r1, vec);
+	__m256d h1 = _mm256_hadd_pd(m1, m1);
+	__m256d m2 = _mm256_mul_pd(r2, vec);
+	__m256d h2 = _mm256_hadd_pd(m2, m2);
+	__m256d m3 = _mm256_mul_pd(r3, vec);
+	__m256d h3 = _mm256_hadd_pd(m3, m3);
+	__m256d m4 = _mm256_mul_pd(r4, vec);
+	__m256d h4 = _mm256_hadd_pd(m4, m4);
+
+	__m256d prod1 = _mm256_set1_pd(h1.m256d_f64[0] + h1.m256d_f64[2]);
+	__m256d prod2 = _mm256_set1_pd(h2.m256d_f64[0] + h2.m256d_f64[2]);
+	__m256d prod3 = _mm256_set1_pd(h3.m256d_f64[0] + h3.m256d_f64[2]);
+	__m256d prod4 = _mm256_set1_pd(h4.m256d_f64[0] + h4.m256d_f64[2]);
+
+	return (dvec4) { prod1.m256d_f64[0], prod2.m256d_f64[0], prod3.m256d_f64[0], prod4.m256d_f64[0] };
+}
+
+inline dvec3 hm_dmat4_multiply_dvec3(dmat4* restrict m, dvec3* restrict v)
+{
+	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
+	__m256d vec = _mm256_maskload_pd((double const*)v, mask);
+	vec.m256d_f64[3] = 1.0;
+
+	__m256d r1 = _mm256_load_pd((const double*)&m->data[0][0]);
+	__m256d r2 = _mm256_load_pd((const double*)&m->data[1][0]);
+	__m256d r3 = _mm256_load_pd((const double*)&m->data[2][0]);
+	__m256d r4 = _mm256_load_pd((const double*)&m->data[3][0]);
+
+	__m256d m1 = _mm256_mul_pd(r1, vec);
+	__m256d h1 = _mm256_hadd_pd(m1, m1);
+	__m256d m2 = _mm256_mul_pd(r2, vec);
+	__m256d h2 = _mm256_hadd_pd(m2, m2);
+	__m256d m3 = _mm256_mul_pd(r3, vec);
+	__m256d h3 = _mm256_hadd_pd(m3, m3);
+	__m256d m4 = _mm256_mul_pd(r4, vec);
+	__m256d h4 = _mm256_hadd_pd(m4, m4);
+
+	__m256d prod1 = _mm256_set1_pd(h1.m256d_f64[0] + h1.m256d_f64[2]);
+	__m256d prod2 = _mm256_set1_pd(h2.m256d_f64[0] + h2.m256d_f64[2]);
+	__m256d prod3 = _mm256_set1_pd(h3.m256d_f64[0] + h3.m256d_f64[2]);
+	__m256d prod4 = _mm256_set1_pd(h4.m256d_f64[0] + h4.m256d_f64[2]);
+
+	return (dvec3) { prod1.m256d_f64[0], prod2.m256d_f64[0], prod3.m256d_f64[0] };
+}
+
+inline dmat4 hm_dmat4_multiply(dmat4* restrict m1, dmat4* restrict m2)
+{
+	__m256d row1 = _mm256_load_pd((const double*)&m1->data[0][0]);
+	__m256d row2 = _mm256_load_pd((const double*)&m1->data[1][0]);
+	__m256d row3 = _mm256_load_pd((const double*)&m1->data[2][0]);
+	__m256d row4 = _mm256_load_pd((const double*)&m1->data[3][0]);
+
+	dmat4 result;
+
+	for (int i = 0; i < 4; i++)
+	{
+		__m256d brod1 = _mm256_set1_pd(m2->data[i][0]);
+		__m256d brod2 = _mm256_set1_pd(m2->data[i][1]);
+		__m256d brod3 = _mm256_set1_pd(m2->data[i][2]);
+		__m256d brod4 = _mm256_set1_pd(m2->data[i][3]);
+
+		__m256d row = _mm256_add_pd(
+			_mm256_add_pd(
+				_mm256_mul_pd(brod1, row1),
+				_mm256_mul_pd(brod2, row2)),
+			_mm256_add_pd(
+				_mm256_mul_pd(brod3, row3),
+				_mm256_mul_pd(brod4, row4)));
+		_mm256_store_pd((double*)&result.data[i][0], row);
+	}
+
+	return result;
+}
+
+inline dmat4 hm_dmat4_scalar_product(dmat4* restrict m, double scalar)
+{
+	__m256d t1 = _mm256_load_pd((const double*)&m->data[0][0]);
+	__m256d t2 = _mm256_load_pd((const double*)&m->data[1][0]);
+	__m256d t3 = _mm256_load_pd((const double*)&m->data[2][0]);
+	__m256d t4 = _mm256_load_pd((const double*)&m->data[3][0]);
+	__m256d s = _mm256_set1_pd(scalar);
+
+	t1 = _mm256_mul_pd(t1, s);
+	t2 = _mm256_mul_pd(t2, s);
+	t3 = _mm256_mul_pd(t3, s);
+	t4 = _mm256_mul_pd(t4, s);
+
+	dmat4 result;
+	_mm256_store_pd((double*)&result.data[0][0], t1);
+	_mm256_store_pd((double*)&result.data[1][0], t2);
+	_mm256_store_pd((double*)&result.data[2][0], t3);
+	_mm256_store_pd((double*)&result.data[3][0], t4);
+
+	return result;
+}
+
+inline dmat4 hm_dmat4_transpose(dmat4* restrict m)
+{
+	__m256d a = _mm256_load_pd((const double*)&m->data[0][0]);
+	__m256d b = _mm256_load_pd((const double*)&m->data[1][0]);
+	__m256d c = _mm256_load_pd((const double*)&m->data[2][0]);
+	__m256d d = _mm256_load_pd((const double*)&m->data[3][0]);
+
+	__m256d r = _mm256_shuffle_pd(a, b, 0b1111);
+	__m256d f = _mm256_shuffle_pd(a, b, 0b0000);
+
+	__m256d g1 = _mm256_shuffle_pd(c, d, 0b1111);
+	__m256d g2 = _mm256_permute4x64_pd(g1, _MM_PERM_BADC);
+	__m256d g3 = _mm256_blend_pd(r, g2, 0b1100);
+
+	__m256d h1 = _mm256_shuffle_pd(c, d, 0b0000);
+	__m256d h2 = _mm256_permute4x64_pd(h1, _MM_PERM_BADC);
+	__m256d h3 = _mm256_blend_pd(f, h2, 0b1100);
+
+	__m256d i3 = _mm256_blend_pd(_mm256_permute4x64_pd(f, _MM_PERM_BADC), h1, 0b1100);
+	__m256d j3 = _mm256_blend_pd(_mm256_permute4x64_pd(r, _MM_PERM_BADC), g1, 0b1100);
+
+	dmat4 result;
+	_mm256_store_pd((double*)&result.data[0][0], h3);
+	_mm256_store_pd((double*)&result.data[1][0], g3);
+	_mm256_store_pd((double*)&result.data[2][0], i3);
+	_mm256_store_pd((double*)&result.data[3][0], j3);
+
+	return result;
+}
+
+inline dmat4 hm_dmat4_identity()
+{
+	dmat4 result;
+	
+	_mm256_store_pd((double*)&result.data[3][0], _mm256_set_pd(1, 0, 0, 0));
+	_mm256_store_pd((double*)&result.data[2][0], _mm256_set_pd(0, 1, 0, 0));
+	_mm256_store_pd((double*)&result.data[1][0], _mm256_set_pd(0, 0, 1, 0));
+	_mm256_store_pd((double*)&result.data[0][0], _mm256_set_pd(0, 0, 0, 1));
+
+	return result;
+}
 
 /* dmat3 functions */
 
