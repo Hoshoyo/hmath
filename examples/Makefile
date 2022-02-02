@@ -1,2 +1,2 @@
 all:
-	gcc -I.. main.c -mavx -mavx2 -o main -lm
+	gcc -g -I.. main.c -mavx -mavx2 -o main -lm

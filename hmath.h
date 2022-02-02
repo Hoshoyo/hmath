@@ -24,6 +24,7 @@ typedef union {
 typedef union {
     struct { double x, y, z, w; };
     struct { double r, g, b, a; };
+	__m256d d256;
 } dvec4;
 
 typedef union {
@@ -54,6 +55,7 @@ typedef union {
 typedef union {
     double data[4][4];
     struct { dvec4 rows[4]; };
+	__m256d d256[4];
 } dmat4;
 
 typedef union {
@@ -509,26 +511,25 @@ inline int hm_dvec4_equal(dvec4 v1, dvec4 v2)
 
 inline dvec4 hm_dvec4_add(dvec4* restrict v1, dvec4* restrict v2)
 {
-	__m256d a = _mm256_load_pd((const double*)v1);
-	__m256d b = _mm256_load_pd((const double*)v2);
-
 #if defined(__linux__)
-	__m256d result = _mm256_add_pd(a, b);
+	__m256d result = _mm256_add_pd(v1->d256, v2->d256);
 	return *(dvec4*)&result;
 #else
+	__m256d a = _mm256_load_pd((const double*)v1);
+	__m256d b = _mm256_load_pd((const double*)v2);
 	return *(dvec4*)_mm256_add_pd(a, b).m256d_f64;
 #endif
 }
 
 inline dvec4 hm_dvec4_sub(dvec4* restrict v1, dvec4* restrict v2)
 {
-	__m256d a = _mm256_load_pd((const double*)v1);
-	__m256d b = _mm256_load_pd((const double*)v2);
 
 #if defined(__linux__)
-	__m256d result = _mm256_sub_pd(a, b);
+	__m256d result = _mm256_sub_pd(v1->d256, v2->d256);
 	return *(dvec4*)&result;
 #else
+	__m256d a = _mm256_load_pd((const double*)v1);
+	__m256d b = _mm256_load_pd((const double*)v2);
 	return *(dvec4*)_mm256_sub_pd(a, b).m256d_f64;
 #endif
 }
@@ -1285,10 +1286,17 @@ inline dmat4 hm_dmat4_transpose(dmat4* restrict m)
 	__m256d j3 = _mm256_blend_pd(_mm256_permute4x64_pd(r, _MM_PERM_BADC), g1, 0b1100);
 
 	dmat4 result;
-	_mm256_store_pd((double*)&result.data[0][0], h3);
-	_mm256_store_pd((double*)&result.data[1][0], g3);
-	_mm256_store_pd((double*)&result.data[2][0], i3);
-	_mm256_store_pd((double*)&result.data[3][0], j3);
+#if defined(__linux__)
+	result.d256[0] = h3;
+	result.d256[1] = g3;
+	result.d256[2] = i3;
+	result.d256[3] = j3;
+#else
+	_mm256_store_pd((double*)result.data[0], h3);
+	_mm256_store_pd((double*)result.data[1], g3);
+	_mm256_store_pd((double*)result.data[2], i3);
+	_mm256_store_pd((double*)result.data[3], j3);
+#endif
 
 	return result;
 }
@@ -1410,9 +1418,15 @@ inline dmat3 hm_dmat3_transpose(dmat3* restrict m)
 	__m256d i3 = _mm256_blend_pd(_mm256_permute4x64_pd(f, _MM_PERM_BADC), h1, 0b1100);
 
 	dmat3 result;
+#if defined(__linux__)
+	result.rows[0] = *(dvec3*)&h3;
+	result.rows[1] = *(dvec3*)&g3;
+	result.rows[2] = *(dvec3*)&i3;
+#else
 	_mm256_store_pd((double*)&result.data[0][0], h3);
 	_mm256_store_pd((double*)&result.data[1][0], g3);
 	_mm256_store_pd((double*)&result.data[2][0], i3);
+#endif
 
 	return result;
 }

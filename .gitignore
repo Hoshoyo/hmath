@@ -2,3 +2,5 @@
 *.exe
 *.ilk
 *.obj
+.vscode/
+examples/main
