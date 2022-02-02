@@ -66,6 +66,10 @@ typedef union {
     struct { dvec2 rows[2]; };
 } dmat2;
 
+#if defined(__linux__)
+#define inline static
+#endif
+
 /* vec4 functions */
 inline int hm_vec4_equal(vec4 v1, vec4 v2)
 {
@@ -77,14 +81,24 @@ inline vec4 hm_vec4_add(vec4* restrict v1, vec4* restrict v2)
 {
 	__m128 a = _mm_load_ps((const float*)v1);
 	__m128 b = _mm_load_ps((const float*)v2);
+#if defined(__linux__)
+	__m128 result = _mm_add_ps(a, b);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_add_ps(a, b).m128_f32;
+#endif
 }
 
 inline vec4 hm_vec4_sub(vec4* restrict v1, vec4* restrict v2)
 {
 	__m128 a = _mm_load_ps((const float*)v1);
 	__m128 b = _mm_load_ps((const float*)v2);
+#if defined(__linux__)
+	__m128 result = _mm_sub_ps(a, b);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_sub_ps(a, b).m128_f32;
+#endif
 }
 
 inline float hm_vec4_dot(vec4* restrict v1, vec4* restrict v2)
@@ -92,7 +106,12 @@ inline float hm_vec4_dot(vec4* restrict v1, vec4* restrict v2)
 	__m128 a = _mm_load_ps((const float*)v1);
 	__m128 b = _mm_load_ps((const float*)v2);
 
+#if defined(__linux__)
+	__m128 result = _mm_dp_ps(a, b, 0xff);
+	return result[0];
+#else
 	return _mm_dp_ps(a, b, 0xff).m128_f32[0];
+#endif
 }
 
 inline vec4 hm_vec4_cross(vec4* restrict v1, vec4* restrict v2)
@@ -108,7 +127,12 @@ inline vec4 hm_vec4_cross(vec4* restrict v1, vec4* restrict v2)
 	__m128 e = _mm_mul_ps(aa, bb);
 	__m128 f = _mm_mul_ps(cc, dd);
 
+#if defined(__linux__)
+	__m128 result = _mm_sub_ps(e, f);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_sub_ps(e, f).m128_f32;
+#endif
 }
 
 inline vec4 hm_vec4_scalar_mul(vec4* restrict v, float s)
@@ -116,7 +140,12 @@ inline vec4 hm_vec4_scalar_mul(vec4* restrict v, float s)
 	__m128 scalar = _mm_set_ps(s, s, s, s);
 	__m128 a = _mm_load_ps((const float*)v);
 
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, scalar);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_mul_ps(a, scalar).m128_f32;
+#endif
 }
 
 inline vec4 hm_vec4_abs(vec4* restrict v)
@@ -128,7 +157,12 @@ inline vec4 hm_vec4_abs(vec4* restrict v)
 	__m128 comp = _mm_cmplt_ps(a, zero);
 	__m128 mask = _mm_add_ps(_mm_and_ps(minus_two, comp), _mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f));
 	
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, mask);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_mul_ps(a, mask).m128_f32;
+#endif
 }
 
 inline vec4 hm_vec4_normalize_fast(vec4* restrict v)
@@ -137,7 +171,12 @@ inline vec4 hm_vec4_normalize_fast(vec4* restrict v)
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 	__m128 rsqroot = _mm_rsqrt_ps(dot);
 
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, rsqroot);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_mul_ps(a, rsqroot).m128_f32;
+#endif
 }
 
 inline vec4 hm_vec4_normalize(vec4* restrict v)
@@ -146,7 +185,12 @@ inline vec4 hm_vec4_normalize(vec4* restrict v)
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 	__m128 sqroot = _mm_sqrt_ps(dot);
 
+#if defined(__linux__)
+	__m128 result = _mm_div_ps(a, sqroot);
+	return *(vec4*)&result;
+#else
 	return *(vec4*)_mm_div_ps(a, sqroot).m128_f32;
+#endif
 }
 
 inline float hm_vec4_length(vec4* restrict v)
@@ -154,7 +198,12 @@ inline float hm_vec4_length(vec4* restrict v)
 	__m128 a = _mm_load_ps((const float*)v);
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 
+#if defined(__linux__)
+	__m128 result = _mm_sqrt_ps(dot);
+	return result[0];
+#else
 	return _mm_sqrt_ps(dot).m128_f32[0];
+#endif
 }
 
 /* vec3 functions */
@@ -169,7 +218,12 @@ inline vec3 hm_vec3_add(vec3* restrict v1, vec3* restrict v2)
 	__m128 a = _mm_maskload_ps((const float*)v1, mask);
 	__m128 b = _mm_maskload_ps((const float*)v2, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_add_ps(a, b);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_add_ps(a, b).m128_f32;
+#endif
 }
 
 inline vec3 hm_vec3_sub(vec3* restrict v1, vec3* restrict v2)
@@ -178,7 +232,12 @@ inline vec3 hm_vec3_sub(vec3* restrict v1, vec3* restrict v2)
 	__m128 a = _mm_maskload_ps((const float*)v1, mask);
 	__m128 b = _mm_maskload_ps((const float*)v2, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_sub_ps(a, b);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_sub_ps(a, b).m128_f32;
+#endif
 }
 
 inline float hm_vec3_dot(vec3* restrict v1, vec3* restrict v2)
@@ -187,7 +246,12 @@ inline float hm_vec3_dot(vec3* restrict v1, vec3* restrict v2)
 	__m128 a = _mm_maskload_ps((const float*)v1, mask);
 	__m128 b = _mm_maskload_ps((const float*)v2, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_dp_ps(a, b, 0xff);
+	return result[0];
+#else
 	return _mm_dp_ps(a, b, 0xff).m128_f32[0];
+#endif
 }
 
 inline vec3 hm_vec3_cross(vec3* restrict v1, vec3* restrict v2)
@@ -204,7 +268,12 @@ inline vec3 hm_vec3_cross(vec3* restrict v1, vec3* restrict v2)
 	__m128 e = _mm_mul_ps(aa, bb);
 	__m128 f = _mm_mul_ps(cc, dd);
 
+#if defined(__linux__)
+	__m128 result = _mm_sub_ps(e, f);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_sub_ps(e, f).m128_f32;
+#endif
 }
 
 inline vec3 hm_vec3_scalar_mul(vec3* restrict v, float s)
@@ -213,7 +282,12 @@ inline vec3 hm_vec3_scalar_mul(vec3* restrict v, float s)
 	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
 	__m128 a = _mm_maskload_ps((const float*)v, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, scalar);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_mul_ps(a, scalar).m128_f32;
+#endif
 }
 
 inline vec3 hm_vec3_abs(vec3* restrict v)
@@ -225,8 +299,13 @@ inline vec3 hm_vec3_abs(vec3* restrict v)
 
 	__m128 comp = _mm_cmplt_ps(a, zero);
 	__m128 mask = _mm_add_ps(_mm_and_ps(minus_two, comp), _mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f));
-	
+
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, mask);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_mul_ps(a, mask).m128_f32;
+#endif
 }
 
 inline vec3 hm_vec3_normalize_fast(vec3* restrict v)
@@ -236,7 +315,12 @@ inline vec3 hm_vec3_normalize_fast(vec3* restrict v)
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 	__m128 rsqroot = _mm_rsqrt_ps(dot);
 
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, rsqroot);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_mul_ps(a, rsqroot).m128_f32;
+#endif
 }
 
 inline vec3 hm_vec3_normalize(vec3* restrict v)
@@ -246,7 +330,12 @@ inline vec3 hm_vec3_normalize(vec3* restrict v)
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 	__m128 sqroot = _mm_sqrt_ps(dot);
 
+#if defined(__linux__)
+	__m128 result = _mm_div_ps(a, sqroot);
+	return *(vec3*)&result;
+#else
 	return *(vec3*)_mm_div_ps(a, sqroot).m128_f32;
+#endif
 }
 
 inline float hm_vec3_length(vec3* restrict v)
@@ -255,7 +344,12 @@ inline float hm_vec3_length(vec3* restrict v)
 	__m128 a = _mm_maskload_ps((const float*)v, loadmask);
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 
+#if defined(__linux__)
+	__m128 result = _mm_sqrt_ps(dot);
+	return result[0];
+#else
 	return _mm_sqrt_ps(dot).m128_f32[0];
+#endif
 }
 
 /* vec2 functions */
@@ -270,7 +364,12 @@ inline vec2 hm_vec2_add(vec2* restrict v1, vec2* restrict v2)
 	__m128 a = _mm_maskload_ps((const float*)v1, mask);
 	__m128 b = _mm_maskload_ps((const float*)v2, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_add_ps(a, b);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_add_ps(a, b).m128_f32;
+#endif
 }
 
 inline vec2 hm_vec2_sub(vec2* restrict v1, vec2* restrict v2)
@@ -279,7 +378,12 @@ inline vec2 hm_vec2_sub(vec2* restrict v1, vec2* restrict v2)
 	__m128 a = _mm_maskload_ps((const float*)v1, mask);
 	__m128 b = _mm_maskload_ps((const float*)v2, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_sub_ps(a, b);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_sub_ps(a, b).m128_f32;
+#endif
 }
 
 inline float hm_vec2_dot(vec2* restrict v1, vec2* restrict v2)
@@ -288,7 +392,12 @@ inline float hm_vec2_dot(vec2* restrict v1, vec2* restrict v2)
 	__m128 a = _mm_maskload_ps((const float*)v1, mask);
 	__m128 b = _mm_maskload_ps((const float*)v2, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_dp_ps(a, b, 0xff);
+	return result[0];
+#else
 	return _mm_dp_ps(a, b, 0xff).m128_f32[0];
+#endif
 }
 
 inline vec2 hm_vec2_cross(vec2* restrict v1, vec2* restrict v2)
@@ -305,7 +414,12 @@ inline vec2 hm_vec2_cross(vec2* restrict v1, vec2* restrict v2)
 	__m128 e = _mm_mul_ps(aa, bb);
 	__m128 f = _mm_mul_ps(cc, dd);
 
+#if defined(__linux__)
+	__m128 result = _mm_sub_ps(e, f);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_sub_ps(e, f).m128_f32;
+#endif
 }
 
 inline vec2 hm_vec2_scalar_mul(vec2* restrict v, float s)
@@ -314,7 +428,12 @@ inline vec2 hm_vec2_scalar_mul(vec2* restrict v, float s)
 	__m128i mask = _mm_set_epi32(0, 0, 0xffffffff, 0xffffffff);
 	__m128 a = _mm_maskload_ps((const float*)v, mask);
 
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, scalar);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_mul_ps(a, scalar).m128_f32;
+#endif
 }
 
 inline vec2 hm_vec2_abs(vec2* restrict v)
@@ -327,7 +446,12 @@ inline vec2 hm_vec2_abs(vec2* restrict v)
 	__m128 comp = _mm_cmplt_ps(a, zero);
 	__m128 mask = _mm_add_ps(_mm_and_ps(minus_two, comp), _mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f));
 	
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, mask);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_mul_ps(a, mask).m128_f32;
+#endif
 }
 
 inline vec2 hm_vec2_normalize_fast(vec2* restrict v)
@@ -337,7 +461,12 @@ inline vec2 hm_vec2_normalize_fast(vec2* restrict v)
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 	__m128 rsqroot = _mm_rsqrt_ps(dot);
 
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, rsqroot);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_mul_ps(a, rsqroot).m128_f32;
+#endif
 }
 
 inline vec2 hm_vec2_normalize(vec2* restrict v)
@@ -347,7 +476,12 @@ inline vec2 hm_vec2_normalize(vec2* restrict v)
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 	__m128 sqroot = _mm_sqrt_ps(dot);
 
+#if defined(__linux__)
+	__m128 result = _mm_div_ps(a, sqroot);
+	return *(vec2*)&result;
+#else
 	return *(vec2*)_mm_div_ps(a, sqroot).m128_f32;
+#endif
 }
 
 inline float hm_vec2_length(vec2* restrict v)
@@ -356,7 +490,12 @@ inline float hm_vec2_length(vec2* restrict v)
 	__m128 a = _mm_maskload_ps((const float*)v, loadmask);
 	__m128 dot = _mm_dp_ps(a, a, 0xff);
 
+#if defined(__linux__)
+	__m128 result = _mm_sqrt_ps(dot);
+	return result[0];
+#else
 	return _mm_sqrt_ps(dot).m128_f32[0];
+#endif
 }
 
 /* dvec4 functions */
@@ -373,7 +512,12 @@ inline dvec4 hm_dvec4_add(dvec4* restrict v1, dvec4* restrict v2)
 	__m256d a = _mm256_load_pd((const double*)v1);
 	__m256d b = _mm256_load_pd((const double*)v2);
 
+#if defined(__linux__)
+	__m256d result = _mm256_add_pd(a, b);
+	return *(dvec4*)&result;
+#else
 	return *(dvec4*)_mm256_add_pd(a, b).m256d_f64;
+#endif
 }
 
 inline dvec4 hm_dvec4_sub(dvec4* restrict v1, dvec4* restrict v2)
@@ -381,7 +525,12 @@ inline dvec4 hm_dvec4_sub(dvec4* restrict v1, dvec4* restrict v2)
 	__m256d a = _mm256_load_pd((const double*)v1);
 	__m256d b = _mm256_load_pd((const double*)v2);
 
+#if defined(__linux__)
+	__m256d result = _mm256_sub_pd(a, b);
+	return *(dvec4*)&result;
+#else
 	return *(dvec4*)_mm256_sub_pd(a, b).m256d_f64;
+#endif
 }
 
 inline double hm_dvec4_dot(dvec4* restrict v1, dvec4* restrict v2)
@@ -392,7 +541,11 @@ inline double hm_dvec4_dot(dvec4* restrict v1, dvec4* restrict v2)
 	__m256d m = _mm256_mul_pd(a, b);
 	__m256d h = _mm256_hadd_pd(m, m);
 
+#if defined(__linux__)
+	return h[0] + h[2];
+#else
 	return h.m256d_f64[0] + h.m256d_f64[2];
+#endif
 }
 
 inline dvec4 hm_dvec4_cross(dvec4* restrict v1, dvec4* restrict v2)
@@ -408,7 +561,12 @@ inline dvec4 hm_dvec4_cross(dvec4* restrict v1, dvec4* restrict v2)
 	__m256d e = _mm256_mul_pd(aa, bb);
 	__m256d f = _mm256_mul_pd(cc, dd);
 
+#if defined(__linux__)
+	__m256d result = _mm256_sub_pd(e, f);
+	return *(dvec4*)&result;
+#else
 	return *(dvec4*)_mm256_sub_pd(e, f).m256d_f64;
+#endif
 }
 
 inline dvec4 hm_dvec4_scalar_mul(dvec4* restrict v, double s)
@@ -416,7 +574,12 @@ inline dvec4 hm_dvec4_scalar_mul(dvec4* restrict v, double s)
 	__m256d scalar = _mm256_set_pd(s, s, s, s);
 	__m256d a = _mm256_load_pd((const double*)v);
 
+#if defined(__linux__)
+	__m256d result = _mm256_mul_pd(a, scalar);
+	return *(dvec4*)&result;
+#else
 	return *(dvec4*)_mm256_mul_pd(a, scalar).m256d_f64;
+#endif
 }
 
 inline dvec4 hm_dvec4_abs(dvec4* restrict v)
@@ -428,7 +591,12 @@ inline dvec4 hm_dvec4_abs(dvec4* restrict v)
 	__m256d comp = _mm256_cmp_pd(a, zero, _CMP_LT_OS);
 	__m256d mask = _mm256_add_pd(_mm256_and_pd(minus_two, comp), _mm256_set_pd(1.0, 1.0, 1.0, 1.0));
 
+#if defined(__linux__)
+	__m256d result = _mm256_mul_pd(a, mask);
+	return *(dvec4*)&result;
+#else
 	return *(dvec4*)_mm256_mul_pd(a, mask).m256d_f64;
+#endif
 }
 
 inline dvec4 hm_dvec4_normalize(dvec4* restrict v)
@@ -437,10 +605,19 @@ inline dvec4 hm_dvec4_normalize(dvec4* restrict v)
 
 	__m256d aa = _mm256_mul_pd(a, a);
 	__m256d hadd = _mm256_hadd_pd(aa, aa);
+#if defined(__linux__)
+	__m256d dot = _mm256_set1_pd(hadd[1] + hadd[3]);
+#else
 	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
+#endif
 	__m256d len = _mm256_sqrt_pd(dot);
 
+#if defined(__linux__)
+	__m256d result = _mm256_div_pd(a, len);
+	return *(dvec4*)&result;
+#else
 	return *(dvec4*)_mm256_div_pd(a, len).m256d_f64;
+#endif
 }
 
 inline double hm_dvec4_length(dvec4* restrict v)
@@ -449,9 +626,15 @@ inline double hm_dvec4_length(dvec4* restrict v)
 
 	__m256d aa = _mm256_mul_pd(a, a);
 	__m256d hadd = _mm256_hadd_pd(aa, aa);
-	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
+#if defined(__linux__)
+	__m256d dot = _mm256_set1_pd(hadd[1] + hadd[3]);
 	
+	__m256d result = _mm256_sqrt_pd(dot);
+	return result[0];
+#else
+	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
 	return _mm256_sqrt_pd(dot).m256d_f64[0];
+#endif
 }
 
 /* dvec3 functions */
@@ -468,7 +651,12 @@ inline dvec3 hm_dvec3_add(dvec3* restrict v1, dvec3* restrict v2)
 	__m256d a = _mm256_maskload_pd((double const*)v1, mask);
 	__m256d b = _mm256_maskload_pd((double const*)v2, mask);
 
+#if defined(__linux__)
+	__m256d result = _mm256_add_pd(a, b);
+	return *(dvec3*)&result;
+#else
 	return *(dvec3*)_mm256_add_pd(a, b).m256d_f64;
+#endif
 }
 
 inline dvec3 hm_dvec3_sub(dvec3* restrict v1, dvec3* restrict v2)
@@ -477,7 +665,12 @@ inline dvec3 hm_dvec3_sub(dvec3* restrict v1, dvec3* restrict v2)
 	__m256d a = _mm256_maskload_pd((double const*)v1, mask);
 	__m256d b = _mm256_maskload_pd((double const*)v2, mask);
 
+#if defined(__linux__)
+	__m256d result = _mm256_sub_pd(a, b);
+	return *(dvec3*)&result;
+#else
 	return *(dvec3*)_mm256_sub_pd(a, b).m256d_f64;
+#endif
 }
 
 inline double hm_dvec3_dot(dvec3* restrict v1, dvec3* restrict v2)
@@ -489,7 +682,11 @@ inline double hm_dvec3_dot(dvec3* restrict v1, dvec3* restrict v2)
 	__m256d m = _mm256_mul_pd(a, b);
 	__m256d h1 = _mm256_hadd_pd(m, m);
 
+#if defined(__linux__)
+	return h1[0] + h1[2];
+#else
 	return h1.m256d_f64[0] + h1.m256d_f64[2];
+#endif
 }
 
 inline dvec3 hm_dvec3_cross(dvec3* restrict v1, dvec3* restrict v2)
@@ -506,7 +703,12 @@ inline dvec3 hm_dvec3_cross(dvec3* restrict v1, dvec3* restrict v2)
 	__m256d e = _mm256_mul_pd(aa, bb);
 	__m256d f = _mm256_mul_pd(cc, dd);
 
+#if defined(__linux__)
+	__m256d result = _mm256_sub_pd(e, f);
+	return *(dvec3*)&result;
+#else
 	return *(dvec3*)_mm256_sub_pd(e, f).m256d_f64;
+#endif
 }
 
 inline dvec3 hm_dvec3_scalar_mul(dvec3* restrict v, double s)
@@ -515,7 +717,12 @@ inline dvec3 hm_dvec3_scalar_mul(dvec3* restrict v, double s)
 	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
 	__m256d a = _mm256_maskload_pd((double const*)v, mask);
 
+#if defined(__linux__)
+	__m256d result = _mm256_mul_pd(a, scalar);
+	return *(dvec3*)&result;
+#else
 	return *(dvec3*)_mm256_mul_pd(a, scalar).m256d_f64;
+#endif
 }
 
 inline dvec3 hm_dvec3_abs(dvec3* restrict v)
@@ -528,7 +735,12 @@ inline dvec3 hm_dvec3_abs(dvec3* restrict v)
 	__m256d comp = _mm256_cmp_pd(a, zero, _CMP_LT_OS);
 	__m256d mask = _mm256_add_pd(_mm256_and_pd(minus_two, comp), _mm256_set_pd(1.0, 1.0, 1.0, 1.0));
 
+#if defined(__linux__)
+	__m256d result = _mm256_mul_pd(a, mask);
+	return *(dvec3*)&result;
+#else
 	return *(dvec3*)_mm256_mul_pd(a, mask).m256d_f64;
+#endif
 }
 
 inline dvec3 hm_dvec3_normalize(dvec3* restrict v)
@@ -538,10 +750,19 @@ inline dvec3 hm_dvec3_normalize(dvec3* restrict v)
 
 	__m256d aa = _mm256_mul_pd(a, a);
 	__m256d hadd = _mm256_hadd_pd(aa, aa);
+#if defined(__linux__)
+	__m256d dot = _mm256_set1_pd(hadd[1] + hadd[3]);
+#else
 	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
+#endif
 	__m256d len = _mm256_sqrt_pd(dot);
 
+#if defined(__linux__)
+	__m256d result = _mm256_div_pd(a, len);
+	return *(dvec3*)&result;
+#else
 	return *(dvec3*)_mm256_div_pd(a, len).m256d_f64;
+#endif
 }
 
 inline double hm_dvec3_length(dvec3* restrict v)
@@ -551,9 +772,15 @@ inline double hm_dvec3_length(dvec3* restrict v)
 
 	__m256d aa = _mm256_mul_pd(a, a);
 	__m256d hadd = _mm256_hadd_pd(aa, aa);
-	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
 	
+#if defined(__linux__)
+	__m256d dot = _mm256_set1_pd(hadd[1] + hadd[3]);
+	__m256d result = _mm256_sqrt_pd(dot);
+	return result[0];
+#else
+	__m256d dot = _mm256_set1_pd(hadd.m256d_f64[1] + hadd.m256d_f64[3]);
 	return _mm256_sqrt_pd(dot).m256d_f64[0];
+#endif
 }
 
 /* dvec2 functions */
@@ -568,7 +795,12 @@ inline dvec2 hm_dvec2_add(dvec2* restrict v1, dvec2* restrict v2)
 	__m128d a = _mm_load_pd((double const*)v1);
 	__m128d b = _mm_load_pd((double const*)v2);
 
+#if defined(__linux__)
+	__m128d result = _mm_add_pd(a, b);
+	return *(dvec2*)&result;
+#else
 	return *(dvec2*)_mm_add_pd(a, b).m128d_f64;
+#endif
 }
 
 inline dvec2 hm_dvec2_sub(dvec2* restrict v1, dvec2* restrict v2)
@@ -576,7 +808,12 @@ inline dvec2 hm_dvec2_sub(dvec2* restrict v1, dvec2* restrict v2)
 	__m128d a = _mm_load_pd((double const*)v1);
 	__m128d b = _mm_load_pd((double const*)v2);
 
+#if defined(__linux__)
+	__m128d result = _mm_sub_pd(a, b);
+	return *(dvec2*)&result;
+#else
 	return *(dvec2*)_mm_sub_pd(a, b).m128d_f64;
+#endif
 }
 
 inline double hm_dvec2_dot(dvec2* restrict v1, dvec2* restrict v2)
@@ -586,7 +823,11 @@ inline double hm_dvec2_dot(dvec2* restrict v1, dvec2* restrict v2)
 
 	__m128d dot = _mm_dp_pd(a, b, 0xff);
 
+#if defined(__linux__)
+	return dot[0];
+#else
 	return dot.m128d_f64[0];
+#endif
 }
 
 inline dvec2 hm_dvec2_scalar_mul(dvec2* restrict v, double s)
@@ -594,7 +835,12 @@ inline dvec2 hm_dvec2_scalar_mul(dvec2* restrict v, double s)
 	__m128d scalar = _mm_set_pd(s, s);
 	__m128d a = _mm_load_pd((double const*)v);
 
+#if defined(__linux__)
+	__m128d result = _mm_mul_pd(a, scalar);
+	return *(dvec2*)&result;
+#else
 	return *(dvec2*)_mm_mul_pd(a, scalar).m128d_f64;
+#endif
 }
 
 inline dvec2 hm_dvec2_abs(dvec2* restrict v)
@@ -606,7 +852,12 @@ inline dvec2 hm_dvec2_abs(dvec2* restrict v)
 	__m128d comp = _mm_cmplt_pd(a, zero);
 	__m128d mask = _mm_add_pd(_mm_and_pd(minus_two, comp), _mm_set_pd(1.0, 1.0));
 
+#if defined(__linux__)
+	__m128d result = _mm_mul_pd(a, mask);
+	return *(dvec2*)&result;
+#else
 	return *(dvec2*)_mm_mul_pd(a, mask).m128d_f64;
+#endif
 }
 
 inline dvec2 hm_dvec2_normalize(dvec2* restrict v)
@@ -616,7 +867,12 @@ inline dvec2 hm_dvec2_normalize(dvec2* restrict v)
 	__m128d dot = _mm_dp_pd(a, a, 0xff);
 	__m128d len = _mm_sqrt_pd(dot);
 
+#if defined(__linux__)
+	__m128d result = _mm_div_pd(a, len);
+	return *(dvec2*)&result;
+#else
 	return *(dvec2*)_mm_div_pd(a, len).m128d_f64;
+#endif
 }
 
 inline double hm_dvec2_length(dvec2* restrict v)
@@ -624,7 +880,12 @@ inline double hm_dvec2_length(dvec2* restrict v)
 	__m128d a = _mm_load_pd((double const*)v);
 	__m128d dot = _mm_dp_pd(a, a, 0xff);
 	
+#if defined(__linux__)
+	__m128d result = _mm_sqrt_pd(dot);
+	return result[0];
+#else
 	return _mm_sqrt_pd(dot).m128d_f64[0];
+#endif
 }
 
 /* mat4 functions */
@@ -643,14 +904,22 @@ inline vec4 hm_mat4_multiply_vec4(mat4* restrict m, vec4* restrict v)
 
 	__m128 result = _mm_shuffle_ps(_mm_movelh_ps(prod1, prod2), _mm_movelh_ps(prod3, prod4), _MM_SHUFFLE(2, 0, 2, 0));
 
+#if defined(__linux__)
+	return *(vec4*)&result;
+#else
 	return *(vec4*)result.m128_f32;
+#endif
 }
 
 inline vec3 hm_mat4_multiply_vec3(mat4* restrict m, vec3* restrict v)
 {
 	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
 	__m128 vec = _mm_maskload_ps((const float*)v, mask);
+#if defined(__linux__)
+	vec[3] = 1.0f;
+#else
 	vec.m128_f32[3] = 1.0f;
+#endif
 	__m128 r1 = _mm_load_ps((const float*)&m->data[0][0]);
 	__m128 r2 = _mm_load_ps((const float*)&m->data[1][0]);
 	__m128 r3 = _mm_load_ps((const float*)&m->data[2][0]);
@@ -663,7 +932,11 @@ inline vec3 hm_mat4_multiply_vec3(mat4* restrict m, vec3* restrict v)
 
 	__m128 result = _mm_shuffle_ps(_mm_movelh_ps(prod1, prod2), _mm_movelh_ps(prod3, prod4), _MM_SHUFFLE(2, 0, 2, 0));
 
+#if defined(__linux__)
+	return *(vec3*)&result;
+#else
 	return *(vec3*)result.m128_f32;
+#endif
 }
 
 inline mat4 hm_mat4_scalar_product(mat4* restrict m, float scalar)
@@ -750,7 +1023,11 @@ inline vec3 hm_mat3_multiply_vec3(mat3* restrict m, vec3* restrict v)
 {
 	__m128i mask = _mm_set_epi32(0, 0xffffffff, 0xffffffff, 0xffffffff);
 	__m128 vec = _mm_maskload_ps((const float*)v, mask);
+#if defined(__linux__)
+	vec[3] = 1.0f;
+#else
 	vec.m128_f32[3] = 1.0f;
+#endif
 	__m128 r1 = _mm_maskload_ps((const float*)&m->data[0][0], mask);
 	__m128 r2 = _mm_maskload_ps((const float*)&m->data[1][0], mask);
 	__m128 r3 = _mm_maskload_ps((const float*)&m->data[2][0], mask);
@@ -759,7 +1036,11 @@ inline vec3 hm_mat3_multiply_vec3(mat3* restrict m, vec3* restrict v)
 	__m128 prod2 = _mm_dp_ps(r2, vec, 0xFF);
 	__m128 prod3 = _mm_dp_ps(r3, vec, 0xFF);
 
+#if defined(__linux__)
+	return (vec3){prod1[0], prod2[0], prod3[0] };
+#else
 	return (vec3){prod1.m128_f32[0], prod2.m128_f32[0], prod3.m128_f32[0] };
+#endif
 }
 
 inline mat3 hm_mat3_scalar_product(mat3* restrict m, float scalar)
@@ -846,24 +1127,47 @@ inline mat2 hm_mat2_multiply(mat2* restrict m1, mat2* restrict m2)
 	__m128 h2 = _mm_hadd_ps(r2, r2);
 
 	__m128 comb = _mm_shuffle_ps(h1, h2, 0b01000100);
+
+#if defined(__linux__)
+	__m128 result = _mm_permute_ps(comb, _MM_PERM_BCDA);
+	return *(mat2*)&result;
+#else
 	return *(mat2*)_mm_permute_ps(comb, _MM_PERM_BCDA).m128_f32;
+#endif
 }
 
 inline mat2 hm_mat2_transpose(mat2* restrict m)
 {
 	__m128 d = _mm_load_ps((const float*)m);
+
+#if defined(__linux__)
+	__m128 result = _mm_permute_ps(d, _MM_PERM_DBCA);
+	return *(mat2*)&result;
+#else
 	return *(mat2*)_mm_permute_ps(d, _MM_PERM_DBCA).m128_f32;
+#endif
 }
 
 inline mat2 hm_mat2_scalar_product(mat2* restrict m, float scalar)
 {
 	__m128 a = _mm_load_ps((const float*)m);
+
+#if defined(__linux__)
+	__m128 result = _mm_mul_ps(a, _mm_set_ps1(scalar));
+	return *(mat2*)&result;
+#else
 	return *(mat2*)_mm_mul_ps(a, _mm_set_ps1(scalar)).m128_f32;
+#endif
 }
 
 inline mat2 hm_mat2_identity()
 {
+#if defined(__linux__)
+	__m128 result = _mm_set_ps(1.0f, 0.0f, 0.0f, 1.0f);
+	return *(mat2*)&result;
+#else
 	return *(mat2*)_mm_set_ps(1.0f, 0.0f, 0.0f, 1.0f).m128_f32;
+#endif
 }
 
 /* dmat4 functions */
@@ -888,10 +1192,17 @@ inline dvec4 hm_dmat4_multiply_dvec4(dmat4* restrict m, dvec4* restrict v)
 	// try shuffle
 	return (dvec4) 
 	{ 
+#if defined(__linux__)
+		h1[0] + h1[2], 
+		h2[0] + h2[2], 
+		h3[0] + h3[2], 
+		h4[0] + h4[2]
+#else
 		h1.m256d_f64[0] + h1.m256d_f64[2], 
 		h2.m256d_f64[0] + h2.m256d_f64[2], 
 		h3.m256d_f64[0] + h3.m256d_f64[2], 
 		h4.m256d_f64[0] + h4.m256d_f64[2]
+#endif
 	};
 }
 
@@ -899,7 +1210,11 @@ inline dvec3 hm_dmat4_multiply_dvec3(dmat4* restrict m, dvec3* restrict v)
 {
 	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
 	__m256d vec = _mm256_maskload_pd((double const*)v, mask);
+#if defined(__linux__)
+	vec[3] = 1.0;
+#else
 	vec.m256d_f64[3] = 1.0;
+#endif
 
 	__m256d r1 = _mm256_load_pd((const double*)&m->data[0][0]);
 	__m256d r2 = _mm256_load_pd((const double*)&m->data[1][0]);
@@ -914,9 +1229,15 @@ inline dvec3 hm_dmat4_multiply_dvec3(dmat4* restrict m, dvec3* restrict v)
 
 	return (dvec3) 
 	{ 
+#if defined(__linux__)
+		h1[0] + h1[2], 
+		h2[0] + h2[2], 
+		h3[0] + h3[2], 
+#else
 		h1.m256d_f64[0] + h1.m256d_f64[2], 
 		h2.m256d_f64[0] + h2.m256d_f64[2], 
 		h3.m256d_f64[0] + h3.m256d_f64[2], 
+#endif
 	};
 }
 
@@ -1017,7 +1338,11 @@ inline dvec3 hm_dmat3_multiply_dvec3(dmat3* restrict m, dvec3* restrict v)
 {
 	__m256i mask = _mm256_set_epi64x(0, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff);
 	__m256d vec = _mm256_maskload_pd((const double*)v, mask);
+#if defined(__linux__)
+	vec[3] = 1.0f;
+#else
 	vec.m256d_f64[3] = 1.0f;
+#endif
 	__m256d r1 = _mm256_maskload_pd((const double*)&m->data[0][0], mask);
 	__m256d r2 = _mm256_maskload_pd((const double*)&m->data[1][0], mask);
 	__m256d r3 = _mm256_maskload_pd((const double*)&m->data[2][0], mask);
@@ -1030,10 +1355,16 @@ inline dvec3 hm_dmat3_multiply_dvec3(dmat3* restrict m, dvec3* restrict v)
 	__m256d h3 = _mm256_hadd_pd(m3, m3);
 
 	return (dvec3) 
-	{ 
+	{
+#if defined(__linux__)
+		h1[0] + h1[2], 
+		h2[0] + h2[2], 
+		h3[0] + h3[2], 
+#else 
 		h1.m256d_f64[0] + h1.m256d_f64[2], 
 		h2.m256d_f64[0] + h2.m256d_f64[2], 
 		h3.m256d_f64[0] + h3.m256d_f64[2], 
+#endif
 	};
 }
 
@@ -1133,22 +1464,46 @@ inline dmat2 hm_dmat2_multiply(dmat2* restrict m1, dmat2* restrict m2)
 	__m256d h2 = _mm256_permute4x64_pd(_mm256_hadd_pd(r2, r2), _MM_PERM_BCDA);
 
 	__m256d comb = _mm256_shuffle_pd(h1, h2, 0b1010);
+#if defined(__linux__)
+	__m256d result = _mm256_permute4x64_pd(comb, _MM_PERM_CDBA);
+	return *(dmat2*)&result;
+#else
 	return *(dmat2*)_mm256_permute4x64_pd(comb, _MM_PERM_CDBA).m256d_f64;
+#endif
 }
 
 inline dmat2 hm_dmat2_transpose(dmat2* restrict m)
 {
 	__m256d d = _mm256_load_pd((const double*)m);
+#if defined(__linux__)
+	__m256d result = _mm256_permute4x64_pd(d, _MM_PERM_DBCA);
+	return *(dmat2*)&result;
+#else
 	return *(dmat2*)_mm256_permute4x64_pd(d, _MM_PERM_DBCA).m256d_f64;
+#endif
 }
 
 inline dmat2 hm_dmat2_scalar_product(dmat2* restrict m, double scalar)
 {
 	__m256d a = _mm256_load_pd((const double*)m);
+#if defined(__linux__)
+	__m256d result = _mm256_mul_pd(a, _mm256_set1_pd(scalar));
+	return *(dmat2*)&result;
+#else
 	return *(dmat2*)_mm256_mul_pd(a, _mm256_set1_pd(scalar)).m256d_f64;
+#endif
 }
 
 inline dmat2 hm_dmat2_identity()
 {
+#if defined(__linux__)
+	__m256d result = _mm256_set_pd(1.0, 0.0, 0.0, 1.0);
+	return *(dmat2*)&result;
+#else
 	return *(dmat2*)_mm256_set_pd(1.0, 0.0, 0.0, 1.0).m256d_f64;
+#endif
 }
+
+#if defined(__linux__)
+#undef inline
+#endif

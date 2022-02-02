@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include "hmath.h"
+
+#include "../hmath.h"
 
 #define WITHIN_MARGIN(F, G, M) (((F) >= ((G) - (M))) && ((F) <= ((G) + (M))))
 
