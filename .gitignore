@@ -4,3 +4,4 @@
 *.obj
 .vscode/
 examples/main
+examples/speed

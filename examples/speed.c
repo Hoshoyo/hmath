@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <time.h>
 #include "../hmath.h"
+
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 
 static double perf_frequency;
@@ -18,11 +21,21 @@ os_time_ms()
 	QueryPerformanceCounter(&li);
 	return ((double)(li.QuadPart) / perf_frequency) * 1000.0;
 }
+#elif defined(__linux__)
+void os_time_init() {}
+double os_time_ms()
+{
+	struct timespec t_spec;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &t_spec);
+	unsigned long long res = t_spec.tv_nsec + 1000000000 * t_spec.tv_sec;
+	return (double)res / 1000000.0;
+}
+#endif
 
-int random()
+static int random_int()
 {
     int result = 0;
-    _rdrand32_step(&result);
+    result = rand();
     return result;
 }
 
@@ -46,8 +59,8 @@ test_vec4()
     float* fresults = calloc(1, count * sizeof(float));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (vec4){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
-        vecs2[i] = (vec4){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
+        vecs1[i] = (vec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = (vec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -130,14 +143,14 @@ void
 test_dvec4()
 {
     const int count = 1024 * 1024;
-    dvec4* vecs1 = calloc(1, count * sizeof(dvec4));
-    dvec4* vecs2 = calloc(1, count * sizeof(dvec4));
+    dvec4* vecs1 = aligned_alloc(1024, count * sizeof(dvec4));
+    dvec4* vecs2 =  aligned_alloc(1024, count * sizeof(dvec4));
     dvec4* results = calloc(1, count * sizeof(dvec4));
     double* fresults = calloc(1, count * sizeof(double));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (dvec4){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
-        vecs2[i] = (dvec4){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
+        vecs1[i] = (dvec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = (dvec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -218,8 +231,8 @@ test_dvec3()
     double* fresults = calloc(1, count * sizeof(double));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (dvec3){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
-        vecs2[i] = (dvec3){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
+        vecs1[i] = (dvec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = (dvec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -301,8 +314,8 @@ test_vec3()
     float* fresults = calloc(1, count * sizeof(float));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (vec3){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
-        vecs2[i] = (vec3){ random() / 1000.0f, random() / 1000.0f, random() / 1000.0f };
+        vecs1[i] = (vec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = (vec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -377,10 +390,50 @@ int main()
     os_time_init();
     printf("1 billion operations\n");
 
-    //test_vec4();
+    test_vec4();
     test_dvec4();
-    //test_vec3();
-    //test_dvec3();
+    test_vec3();
+    test_dvec3();
     
     return 0;
 }
+
+/*
+    Linux
+
+    examples $ ./speed 
+    1 billion operations
+    Elapsed vec4 add: 2345.949028 ms
+    Elapsed vec4 dot: 2212.202023 ms
+    Elapsed vec4 normalize: 2043.374568 ms
+    Elapsed vec4 normalize fast: 1789.477201 ms
+    Elapsed vec4 length: 1356.521813 ms
+    Elapsed vec4 cross: 2474.695104 ms
+    Elapsed vec4 scalar mul: 1864.751791 ms
+    Elapsed vec4 abs: 1744.302662 ms
+
+    Elapsed dvec4 add: 5178.094389 ms
+    Elapsed dvec4 dot: 3275.663008 ms
+    Elapsed dvec4 normalize: 6307.718846 ms
+    Elapsed dvec4 length: 3795.735880 ms
+    Elapsed dvec4 cross: 5077.216081 ms
+    Elapsed dvec4 scalar mul: 4211.299050 ms
+    Elapsed dvec4 abs: 3989.876452 ms
+
+    Elapsed vec3 add: 2760.888243 ms
+    Elapsed vec3 dot: 1611.408845 ms
+    Elapsed vec3 normalize: 2669.961244 ms
+    Elapsed vec3 normalize fast: 2468.732401 ms
+    Elapsed vec3 length: 1328.039708 ms
+    Elapsed vec3 cross: 2794.601105 ms
+    Elapsed vec3 scalar mul: 2657.731960 ms
+    Elapsed vec3 abs: 2563.941205 ms
+
+    Elapsed dvec3 add: 4268.896420 ms
+    Elapsed dvec3 dot: 2802.857317 ms
+    Elapsed dvec3 normalize: 6185.614056 ms
+    Elapsed dvec3 length: 3771.633514 ms
+    Elapsed dvec3 cross: 4250.477878 ms
+    Elapsed dvec3 scalar mul: 3591.949945 ms
+    Elapsed dvec3 abs: 3318.034499 ms
+*/
