@@ -515,22 +515,17 @@ inline dvec4 hm_dvec4_add(dvec4* restrict v1, dvec4* restrict v2)
 	__m256d result = _mm256_add_pd(v1->d256, v2->d256);
 	return *(dvec4*)&result;
 #else
-	__m256d a = _mm256_load_pd((const double*)v1);
-	__m256d b = _mm256_load_pd((const double*)v2);
-	return *(dvec4*)_mm256_add_pd(a, b).m256d_f64;
+	return *(dvec4*)_mm256_add_pd(v1->d256, v2->d256).m256d_f64;
 #endif
 }
 
 inline dvec4 hm_dvec4_sub(dvec4* restrict v1, dvec4* restrict v2)
 {
-
 #if defined(__linux__)
 	__m256d result = _mm256_sub_pd(v1->d256, v2->d256);
 	return *(dvec4*)&result;
 #else
-	__m256d a = _mm256_load_pd((const double*)v1);
-	__m256d b = _mm256_load_pd((const double*)v2);
-	return *(dvec4*)_mm256_sub_pd(a, b).m256d_f64;
+	return *(dvec4*)_mm256_sub_pd(v1->d256, v2->d256).m256d_f64;
 #endif
 }
 
