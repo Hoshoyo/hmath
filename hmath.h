@@ -25,7 +25,10 @@ typedef union {
     struct { double x, y, z, w; };
     struct { double r, g, b, a; };
 	__m256d d256;
-} dvec4;
+} dvec4 
+#if defined(__linux__) 
+__attribute__((aligned(32)));
+#endif
 
 typedef union {
     struct { double x, y, z; };
@@ -56,7 +59,10 @@ typedef union {
     double data[4][4];
     struct { dvec4 rows[4]; };
 	__m256d d256[4];
-} dmat4;
+} dmat4
+#if defined(__linux__) 
+__attribute__((aligned(32)));
+#endif
 
 typedef union {
     double data[3][3];
