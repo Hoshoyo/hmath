@@ -156,8 +156,8 @@ test_dvec4()
     dvec4* vecs1 = (dvec4*)_aligned_malloc(count * sizeof(dvec4), 1024);
     dvec4* vecs2 =  (dvec4*)_aligned_malloc(count * sizeof(dvec4), 1024);
 #else
-    dvec4* vecs1 = aligned_alloc(1024, count * sizeof(dvec4));
-    dvec4* vecs2 =  aligned_alloc(1024, count * sizeof(dvec4));
+    dvec4* vecs1 = (dvec4*)aligned_alloc(1024, count * sizeof(dvec4));
+    dvec4* vecs2 =  (dvec4*)aligned_alloc(1024, count * sizeof(dvec4));
 #endif
     dvec4* results = (dvec4*)calloc(1, count * sizeof(dvec4));
     double* fresults = (double*)calloc(1, count * sizeof(double));
