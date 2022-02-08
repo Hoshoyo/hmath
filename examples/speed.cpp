@@ -51,18 +51,18 @@ Elapsed vec4 cross: 4293.393800 ms
 Elapsed vec4 scalar mul: 2991.661900 ms
 Elapsed vec4 abs: 2727.893600 ms
 */
-void
+float
 test_vec4()
 {
     const int count = 1024 * 1024;
-    vec4* vecs1 = calloc(1, count * sizeof(vec4));
-    vec4* vecs2 = calloc(1, count * sizeof(vec4));
-    vec4* results = calloc(1, count * sizeof(vec4));
-    float* fresults = calloc(1, count * sizeof(float));
+    vec4* vecs1 = (vec4*)calloc(1, count * sizeof(vec4));
+    vec4* vecs2 = (vec4*)calloc(1, count * sizeof(vec4));
+    vec4* results = (vec4*)calloc(1, count * sizeof(vec4));
+    float* fresults = (float*)calloc(1, count * sizeof(float));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (vec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
-        vecs2[i] = (vec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs1[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -130,6 +130,13 @@ test_vec4()
     printf("Elapsed vec4 abs: %f ms\n", os_time_ms() - start_vec4_abs);
 
     printf("\n");
+
+    float rr = 0.0f;
+    for(int i = 0; i < count; ++i)
+    {
+        rr += fresults[i] + results[i].x;
+    }
+    return rr;
 }
 
 /*
@@ -141,23 +148,23 @@ Elapsed dvec4 cross: 6169.849200 ms
 Elapsed dvec4 scalar mul: 4412.779000 ms
 Elapsed dvec4 abs: 3993.645000 ms
 */
-void
+double
 test_dvec4()
 {
     const int count = 1024 * 1024;
 #if defined(_WIN32) || defined(_WIN64)
-    dvec4* vecs1 = _aligned_malloc(count * sizeof(dvec4), 1024);
-    dvec4* vecs2 =  _aligned_malloc(count * sizeof(dvec4), 1024);
+    dvec4* vecs1 = (dvec4*)_aligned_malloc(count * sizeof(dvec4), 1024);
+    dvec4* vecs2 =  (dvec4*)_aligned_malloc(count * sizeof(dvec4), 1024);
 #else
     dvec4* vecs1 = aligned_alloc(1024, count * sizeof(dvec4));
     dvec4* vecs2 =  aligned_alloc(1024, count * sizeof(dvec4));
 #endif
-    dvec4* results = calloc(1, count * sizeof(dvec4));
-    double* fresults = calloc(1, count * sizeof(double));
+    dvec4* results = (dvec4*)calloc(1, count * sizeof(dvec4));
+    double* fresults = (double*)calloc(1, count * sizeof(double));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (dvec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
-        vecs2[i] = (dvec4){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs1[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -217,6 +224,13 @@ test_dvec4()
     printf("Elapsed dvec4 abs: %f ms\n", os_time_ms() - start_vec4_abs);
 
     printf("\n");
+
+    double rr = 0.0;
+    for(int i = 0; i < count; ++i)
+    {
+        rr += fresults[i] + results[i].x;
+    }
+    return rr;
 }
 
 /*
@@ -228,18 +242,18 @@ Elapsed dvec3 cross: 4241.054300 ms
 Elapsed dvec3 scalar mul: 3367.066000 ms
 Elapsed dvec3 abs: 3140.505700 ms
 */
-void
+double
 test_dvec3()
 {
     const int count = 1024 * 1024;
-    dvec3* vecs1 = calloc(1, count * sizeof(dvec3));
-    dvec3* vecs2 = calloc(1, count * sizeof(dvec3));
-    dvec3* results = calloc(1, count * sizeof(dvec3));
-    double* fresults = calloc(1, count * sizeof(double));
+    dvec3* vecs1 = (dvec3*)calloc(1, count * sizeof(dvec3));
+    dvec3* vecs2 = (dvec3*)calloc(1, count * sizeof(dvec3));
+    dvec3* results = (dvec3*)calloc(1, count * sizeof(dvec3));
+    double* fresults = (double*)calloc(1, count * sizeof(double));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (dvec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
-        vecs2[i] = (dvec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs1[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -299,6 +313,13 @@ test_dvec3()
     printf("Elapsed dvec3 abs: %f ms\n", os_time_ms() - start_vec4_abs);
 
     printf("\n");
+
+    double rr = 0.0;
+    for(int i = 0; i < count; ++i)
+    {
+        rr += fresults[i] + results[i].x;
+    }
+    return rr;
 }
 
 /*
@@ -311,18 +332,18 @@ Elapsed vec3 cross: 2293.234400 ms
 Elapsed vec3 scalar mul: 1781.339500 ms
 Elapsed vec3 abs: 1586.712500 ms
 */
-void
+float
 test_vec3()
 {
     const int count = 1024 * 1024;
-    vec3* vecs1 = calloc(1, count * sizeof(vec3));
-    vec3* vecs2 = calloc(1, count * sizeof(vec3));
-    vec3* results = calloc(1, count * sizeof(vec3));
-    float* fresults = calloc(1, count * sizeof(float));
+    vec3* vecs1 = (vec3*)calloc(1, count * sizeof(vec3));
+    vec3* vecs2 = (vec3*)calloc(1, count * sizeof(vec3));
+    vec3* results = (vec3*)calloc(1, count * sizeof(vec3));
+    float* fresults = (float*)calloc(1, count * sizeof(float));
     for(int i = 0; i < count; ++i)
     {
-        vecs1[i] = (vec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
-        vecs2[i] = (vec3){ random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs1[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
+        vecs2[i] = { random_int() / 1000.0f, random_int() / 1000.0f, random_int() / 1000.0f };
     }
 
     double start_vec4_add = os_time_ms();
@@ -390,6 +411,13 @@ test_vec3()
     printf("Elapsed vec3 abs: %f ms\n", os_time_ms() - start_vec4_abs);
 
     printf("\n");
+    
+    float rr = 0.0f;
+    for(int i = 0; i < count; ++i)
+    {
+        rr += fresults[i] + results[i].x;
+    }
+    return rr;
 }
 
 int main()

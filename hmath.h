@@ -72,6 +72,10 @@ typedef union {
 #define inline static
 #endif
 
+#if __cplusplus
+#define restrict __restrict
+#endif
+
 /* vec4 functions */
 inline int hm_vec4_equal(vec4 v1, vec4 v2)
 {
@@ -1031,11 +1035,18 @@ inline vec3 hm_mat3_multiply_vec3(mat3* restrict m, vec3* restrict v)
 	__m128 prod1 = _mm_dp_ps(r1, vec, 0xFF);
 	__m128 prod2 = _mm_dp_ps(r2, vec, 0xFF);
 	__m128 prod3 = _mm_dp_ps(r3, vec, 0xFF);
-
+#if defined(__cplusplus)
+#if defined(__linux__)
+	return {prod1[0], prod2[0], prod3[0] };
+#else
+	return {prod1.m128_f32[0], prod2.m128_f32[0], prod3.m128_f32[0] };
+#endif	
+#else
 #if defined(__linux__)
 	return (vec3){prod1[0], prod2[0], prod3[0] };
 #else
 	return (vec3){prod1.m128_f32[0], prod2.m128_f32[0], prod3.m128_f32[0] };
+#endif
 #endif
 }
 
@@ -1186,7 +1197,10 @@ inline dvec4 hm_dmat4_multiply_dvec4(dmat4* restrict m, dvec4* restrict v)
 	__m256d h4 = _mm256_hadd_pd(m4, m4);
 
 	// try shuffle
-	return (dvec4) 
+	return 
+#if !defined(__cplusplus)
+	(dvec4) 
+#endif
 	{ 
 #if defined(__linux__)
 		h1[0] + h1[2], 
@@ -1223,7 +1237,10 @@ inline dvec3 hm_dmat4_multiply_dvec3(dmat4* restrict m, dvec3* restrict v)
 	__m256d m3 = _mm256_mul_pd(r3, vec);
 	__m256d h3 = _mm256_hadd_pd(m3, m3);
 
-	return (dvec3) 
+	return 
+#if !defined(__cplusplus)
+	(dvec3) 
+#endif
 	{ 
 #if defined(__linux__)
 		h1[0] + h1[2], 
@@ -1357,7 +1374,10 @@ inline dvec3 hm_dmat3_multiply_dvec3(dmat3* restrict m, dvec3* restrict v)
 	__m256d m3 = _mm256_mul_pd(r3, vec);
 	__m256d h3 = _mm256_hadd_pd(m3, m3);
 
-	return (dvec3) 
+	return 
+#if !defined(__cplusplus)
+	(dvec3) 
+#endif
 	{
 #if defined(__linux__)
 		h1[0] + h1[2], 
@@ -1512,6 +1532,10 @@ inline dmat2 hm_dmat2_identity()
 	return *(dmat2*)_mm256_set_pd(1.0, 0.0, 0.0, 1.0).m256d_f64;
 #endif
 }
+
+#if __cplusplus
+#undef restrict
+#endif
 
 #if defined(__linux__)
 #undef inline
